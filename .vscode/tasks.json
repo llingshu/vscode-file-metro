@@ -1,0 +1,50 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "npm: watch",
+            "command": "npm run watch",
+            "options": {
+                "env": {
+                    "PATH": "/Users/lindstnarz/.nvm/versions/node/v24.5.0/bin:${env:PATH}"
+                }
+            },
+            "problemMatcher": {
+                "base": "$ts-webpack",
+                "isBackground": true,
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": {
+                        "regexp": ".*webpack.*"
+                    },
+                    "endsPattern": {
+                        "regexp": ".*compiled.*"
+                    }
+                }
+            },
+            "presentation": {
+                "reveal": "never"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "type": "shell",
+            "label": "npm: compile",
+            "command": "npm run compile",
+            "options": {
+                "env": {
+                    "PATH": "/Users/lindstnarz/.nvm/versions/node/v24.5.0/bin:${env:PATH}"
+                }
+            },
+            "problemMatcher": "$ts-webpack",
+            "group": "build",
+            "presentation": {
+                "reveal": "never"
+            }
+        }
+    ]
+}
