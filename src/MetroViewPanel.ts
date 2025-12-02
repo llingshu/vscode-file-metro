@@ -49,6 +49,7 @@ export class MetroViewPanel {
             message => {
                 switch (message.command) {
                     case 'saveLayout':
+                        console.log('Received saveLayout message from webview');
                         this._fileTracker.saveLayout(message.layout);
                         return;
                     case 'openFile':
@@ -59,6 +60,9 @@ export class MetroViewPanel {
                         if (newNode) {
                             this.updateLayout(this._fileTracker.getLayout());
                         }
+                        return;
+                    case 'webviewReady':
+                        this.updateLayout(this._fileTracker.getLayout());
                         return;
                 }
             },
@@ -92,10 +96,6 @@ export class MetroViewPanel {
     private _update() {
         const webview = this._panel.webview;
         this._panel.webview.html = this._getHtmlForWebview(webview);
-
-        // Send initial layout
-        const layout = this._fileTracker.getLayout();
-        webview.postMessage({ command: 'updateLayout', layout });
     }
 
     private _getHtmlForWebview(webview: vscode.Webview) {

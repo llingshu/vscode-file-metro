@@ -12,14 +12,20 @@ body {
 /* Station Node */
 .station-node {
     background: #ffffff;
-    border: 3px solid #007fd4;
+    border: 4px solid #007fd4;
+    /* Thicker border */
     border-radius: 50%;
-    width: 14px;
-    height: 14px;
+    width: 20px;
+    /* Slightly larger */
+    height: 20px;
     position: relative;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    /* Stronger shadow */
     transition: all 0.2s ease;
     box-sizing: border-box;
+    z-index: 10;
+    cursor: move;
+    /* Default move cursor */
 }
 
 .station-node.missing {
@@ -28,14 +34,25 @@ body {
 }
 
 .station-node.selected {
-    border-color: #ffffff;
-    box-shadow: 0 0 0 3px #007fd4;
+    /* border-color: #ffffff; Removed to prevent "all white" look */
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+    /* Subtle glow instead */
+}
+
+.station-node.ghost {
+    opacity: 0.4;
+    border-style: solid;
+    /* Solid but transparent looks better than broken dashed */
+    background: rgba(255, 255, 255, 0.5);
+    pointer-events: none;
+    z-index: 1;
+    /* Behind everything */
 }
 
 .station-label {
     position: absolute;
-    top: 18px;
-    /* 14px height + 4px gap */
+    top: 24px;
+    /* 20px height + 4px gap */
     left: 50%;
     transform: translateX(-50%);
     font-size: 11px;
@@ -52,6 +69,94 @@ body {
 .station-handle {
     opacity: 0;
     /* Hide handles but keep them functional */
+    pointer-events: none !important;
+    /* Disable connections by default */
+}
+
+.station-handle.center {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 1px !important;
+    height: 1px !important;
+    border: none !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    background: transparent !important;
+    border-radius: 50%;
+    overflow: visible !important;
+}
+
+.station-handle.center.source {
+    z-index: 101 !important;
+}
+
+.station-handle.center.target {
+    z-index: 100 !important;
+}
+
+/* Source Handle: Covers the Node (Start Drag) */
+.station-handle.center.source::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    /* Full node size */
+    height: 20px;
+    border-radius: 50%;
+    background: transparent;
+    cursor: crosshair;
+    pointer-events: none;
+    /* Default: Pass through to node for dragging */
+}
+
+/* Target Handle: Large Outer Ring (End Drag) */
+.station-handle.center.target::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 32px;
+    /* Large catch area */
+    height: 32px;
+    border-radius: 50%;
+    background: transparent;
+    pointer-events: none;
+    /* Default: Pass through to node for dragging */
+}
+
+/* Enable Source Handle when Alt is held (Connection Mode) */
+.connection-mode .station-handle.center.source,
+.connection-mode .station-handle.center.source::after {
+    pointer-events: all !important;
+}
+
+/* Enable Target Handle when dragging a connection (to receive drop) */
+body.is-connecting .station-handle.center.target,
+body.is-connecting .station-handle.center.target::after {
+    pointer-events: all !important;
+}
+
+/* When dragging a connection, disable Source handles so Target handles catch the drop */
+body.is-connecting .station-handle.center.source,
+body.is-connecting .station-handle.center.source::after {
+    pointer-events: none !important;
+    display: none !important;
+    /* Ensure it's gone */
+}
+
+.connection-mode .station-node {
+    cursor: crosshair !important;
+}
+
+.connection-mode .station-handle {
+    pointer-events: auto !important;
+    /* Enable connections when Alt is pressed */
+    cursor: crosshair;
 }
 
 .react-flow__edge-path {
@@ -60,7 +165,175 @@ body {
     stroke-linecap: round;
 }
 
+/* Context Menu */
+.context-menu {
+    position: fixed;
+    z-index: 1000;
+    background: rgba(30, 30, 30, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    min-width: 180px;
+    animation: fadeIn 0.1s ease-out;
+}
+
+.context-menu-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #e0e0e0;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    transition: background 0.1s;
+}
+
 .context-menu-item:hover {
-    background-color: #094771;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.context-menu-item.danger {
+    color: #ff4d4d;
+}
+
+.context-menu-item.danger:hover {
+    background-color: rgba(255, 77, 77, 0.1);
+}
+
+.menu-item-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.color-preview {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.submenu-arrow {
+    font-size: 10px;
+    color: #888;
+}
+
+/* Submenu */
+.context-submenu {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    margin-left: 4px;
+    background: rgba(30, 30, 30, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    min-width: 150px;
+    animation: fadeIn 0.1s ease-out;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+    background: #252526;
+    border: 1px solid #454545;
+    border-radius: 8px;
+    padding: 20px;
+    width: 300px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.modal-content h3 {
+    margin: 0 0 16px 0;
+    font-size: 16px;
+    color: #fff;
+}
+
+.color-picker-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.native-color-picker {
+    width: 50px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.hex-input {
+    flex: 1;
+    background: #333;
+    border: 1px solid #555;
+    color: #fff;
+    padding: 0 8px;
+    border-radius: 4px;
+    font-family: monospace;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.modal-btn {
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.modal-btn.cancel {
+    background: transparent;
+    color: #ccc;
+    border: 1px solid #555;
+}
+
+.modal-btn.cancel:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.modal-btn.apply {
+    background: #007fd4;
     color: white;
+}
+
+.modal-btn.apply:hover {
+    background: #0060a0;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }

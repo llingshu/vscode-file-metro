@@ -6,6 +6,7 @@ export interface MetroNode {
     label?: string;
     parentId?: string; // For groups
     status?: 'active' | 'missing';
+    color?: string; // Custom color
 }
 
 export interface MetroGroup {
@@ -27,4 +28,6 @@ export interface MetroLayout {
     nodes: MetroNode[];
     groups: MetroGroup[];
     edges: MetroEdge[];
+    viewport?: { x: number; y: number; zoom: number };
+    zoomLocked?: boolean;
 }

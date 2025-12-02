@@ -21,9 +21,10 @@
 
 ### 4. Connections (Metro Lines)
 1.  Add another file to the canvas.
-2.  Drag from one station's handle (top/bottom) to the other.
-3.  **Verify**: A thick colored line connects them.
-4.  **Verify**: The line color is randomly assigned from the Metro palette.
+2.  **Hold the `Alt` key** (or `Option` on Mac).
+3.  Drag from one station's handle (top/bottom) to the other.
+4.  **Verify**: A thick colored line connects them.
+5.  **Verify**: Without holding `Alt`, dragging from the station moves the node instead of creating a connection.
 
 ### 5. Grid System
 1.  **Verify**: The background shows a dot matrix pattern (dots are visible, ~4px).

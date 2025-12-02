@@ -4,6 +4,7 @@
         {
             "type": "shell",
             "label": "npm: watch",
+            "isBackground": true,
             "command": "npm run watch",
             "options": {
                 "env": {
@@ -11,15 +12,33 @@
                 }
             },
             "problemMatcher": {
-                "base": "$ts-webpack",
-                "isBackground": true,
+                "owner": "typescript",
+                "source": "ts",
+                "applyTo": "closedDocuments",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}"
+                ],
+                "pattern": [
+                    {
+                        "regexp": "\\[tsl\\] ERROR in (.*)\\((\\d+),(\\d+)\\)",
+                        "file": 1,
+                        "line": 2,
+                        "column": 3
+                    },
+                    {
+                        "regexp": "\\s*TS(\\d+):\\s*(.*)$",
+                        "code": 1,
+                        "message": 2
+                    }
+                ],
                 "background": {
                     "activeOnStart": true,
                     "beginsPattern": {
-                        "regexp": ".*webpack.*"
+                        "regexp": ".*webpack --watch.*"
                     },
                     "endsPattern": {
-                        "regexp": ".*compiled.*"
+                        "regexp": ".*compiled successfully.*"
                     }
                 }
             },
@@ -40,7 +59,28 @@
                     "PATH": "/Users/lindstnarz/.nvm/versions/node/v24.5.0/bin:${env:PATH}"
                 }
             },
-            "problemMatcher": "$ts-webpack",
+            "problemMatcher": {
+                "owner": "typescript",
+                "source": "ts",
+                "applyTo": "closedDocuments",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}"
+                ],
+                "pattern": [
+                    {
+                        "regexp": "\\[tsl\\] ERROR in (.*)\\((\\d+),(\\d+)\\)",
+                        "file": 1,
+                        "line": 2,
+                        "column": 3
+                    },
+                    {
+                        "regexp": "\\s*TS(\\d+):\\s*(.*)$",
+                        "code": 1,
+                        "message": 2
+                    }
+                ]
+            },
             "group": "build",
             "presentation": {
                 "reveal": "never"

@@ -20,6 +20,7 @@ export class FileTracker {
                 fs.mkdirSync(vscodeDir);
             }
             this.layoutFilePath = path.join(vscodeDir, 'metro-layout.json');
+            console.log('FileTracker initialized. Layout path:', this.layoutFilePath);
             this.loadLayout();
         }
     }
@@ -68,6 +69,7 @@ export class FileTracker {
     public saveLayout(layout: MetroLayout) {
         this.currentLayout = layout;
         if (this.layoutFilePath) {
+            console.log('Saving layout to:', this.layoutFilePath);
             fs.writeFileSync(this.layoutFilePath, JSON.stringify(layout, null, 2));
         }
     }

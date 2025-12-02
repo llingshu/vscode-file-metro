@@ -797,6 +797,7 @@ class FileTracker {
                 fs.mkdirSync(vscodeDir);
             }
             this.layoutFilePath = path.join(vscodeDir, 'metro-layout.json');
+            console.log('FileTracker initialized. Layout path:', this.layoutFilePath);
             this.loadLayout();
         }
     }
@@ -840,6 +841,7 @@ class FileTracker {
     saveLayout(layout) {
         this.currentLayout = layout;
         if (this.layoutFilePath) {
+            console.log('Saving layout to:', this.layoutFilePath);
             fs.writeFileSync(this.layoutFilePath, JSON.stringify(layout, null, 2));
         }
     }
@@ -966,6 +968,7 @@ class MetroViewPanel {
         this._panel.webview.onDidReceiveMessage(message => {
             switch (message.command) {
                 case 'saveLayout':
+                    console.log('Received saveLayout message from webview');
                     this._fileTracker.saveLayout(message.layout);
                     return;
                 case 'openFile':
@@ -976,6 +979,9 @@ class MetroViewPanel {
                     if (newNode) {
                         this.updateLayout(this._fileTracker.getLayout());
                     }
+                    return;
+                case 'webviewReady':
+                    this.updateLayout(this._fileTracker.getLayout());
                     return;
             }
         }, null, this._disposables);
@@ -1002,9 +1008,6 @@ class MetroViewPanel {
     _update() {
         const webview = this._panel.webview;
         this._panel.webview.html = this._getHtmlForWebview(webview);
-        // Send initial layout
-        const layout = this._fileTracker.getLayout();
-        webview.postMessage({ command: 'updateLayout', layout });
     }
     _getHtmlForWebview(webview) {
         const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'dist', 'webview.js'));

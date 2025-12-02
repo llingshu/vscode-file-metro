@@ -468,14 +468,20 @@ ___CSS_LOADER_EXPORT___.push([module.id, `body {
 /* Station Node */
 .station-node {
     background: #ffffff;
-    border: 3px solid #007fd4;
+    border: 4px solid #007fd4;
+    /* Thicker border */
     border-radius: 50%;
-    width: 14px;
-    height: 14px;
+    width: 20px;
+    /* Slightly larger */
+    height: 20px;
     position: relative;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    /* Stronger shadow */
     transition: all 0.2s ease;
     box-sizing: border-box;
+    z-index: 10;
+    cursor: move;
+    /* Default move cursor */
 }
 
 .station-node.missing {
@@ -484,14 +490,25 @@ ___CSS_LOADER_EXPORT___.push([module.id, `body {
 }
 
 .station-node.selected {
-    border-color: #ffffff;
-    box-shadow: 0 0 0 3px #007fd4;
+    /* border-color: #ffffff; Removed to prevent "all white" look */
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+    /* Subtle glow instead */
+}
+
+.station-node.ghost {
+    opacity: 0.4;
+    border-style: solid;
+    /* Solid but transparent looks better than broken dashed */
+    background: rgba(255, 255, 255, 0.5);
+    pointer-events: none;
+    z-index: 1;
+    /* Behind everything */
 }
 
 .station-label {
     position: absolute;
-    top: 18px;
-    /* 14px height + 4px gap */
+    top: 24px;
+    /* 20px height + 4px gap */
     left: 50%;
     transform: translateX(-50%);
     font-size: 11px;
@@ -508,6 +525,94 @@ ___CSS_LOADER_EXPORT___.push([module.id, `body {
 .station-handle {
     opacity: 0;
     /* Hide handles but keep them functional */
+    pointer-events: none !important;
+    /* Disable connections by default */
+}
+
+.station-handle.center {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 1px !important;
+    height: 1px !important;
+    border: none !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    background: transparent !important;
+    border-radius: 50%;
+    overflow: visible !important;
+}
+
+.station-handle.center.source {
+    z-index: 101 !important;
+}
+
+.station-handle.center.target {
+    z-index: 100 !important;
+}
+
+/* Source Handle: Covers the Node (Start Drag) */
+.station-handle.center.source::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    /* Full node size */
+    height: 20px;
+    border-radius: 50%;
+    background: transparent;
+    cursor: crosshair;
+    pointer-events: none;
+    /* Default: Pass through to node for dragging */
+}
+
+/* Target Handle: Large Outer Ring (End Drag) */
+.station-handle.center.target::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 32px;
+    /* Large catch area */
+    height: 32px;
+    border-radius: 50%;
+    background: transparent;
+    pointer-events: none;
+    /* Default: Pass through to node for dragging */
+}
+
+/* Enable Source Handle when Alt is held (Connection Mode) */
+.connection-mode .station-handle.center.source,
+.connection-mode .station-handle.center.source::after {
+    pointer-events: all !important;
+}
+
+/* Enable Target Handle when dragging a connection (to receive drop) */
+body.is-connecting .station-handle.center.target,
+body.is-connecting .station-handle.center.target::after {
+    pointer-events: all !important;
+}
+
+/* When dragging a connection, disable Source handles so Target handles catch the drop */
+body.is-connecting .station-handle.center.source,
+body.is-connecting .station-handle.center.source::after {
+    pointer-events: none !important;
+    display: none !important;
+    /* Ensure it's gone */
+}
+
+.connection-mode .station-node {
+    cursor: crosshair !important;
+}
+
+.connection-mode .station-handle {
+    pointer-events: auto !important;
+    /* Enable connections when Alt is pressed */
+    cursor: crosshair;
 }
 
 .react-flow__edge-path {
@@ -516,10 +621,178 @@ ___CSS_LOADER_EXPORT___.push([module.id, `body {
     stroke-linecap: round;
 }
 
+/* Context Menu */
+.context-menu {
+    position: fixed;
+    z-index: 1000;
+    background: rgba(30, 30, 30, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    min-width: 180px;
+    animation: fadeIn 0.1s ease-out;
+}
+
+.context-menu-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #e0e0e0;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    transition: background 0.1s;
+}
+
 .context-menu-item:hover {
-    background-color: #094771;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.context-menu-item.danger {
+    color: #ff4d4d;
+}
+
+.context-menu-item.danger:hover {
+    background-color: rgba(255, 77, 77, 0.1);
+}
+
+.menu-item-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.color-preview {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.submenu-arrow {
+    font-size: 10px;
+    color: #888;
+}
+
+/* Submenu */
+.context-submenu {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    margin-left: 4px;
+    background: rgba(30, 30, 30, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    min-width: 150px;
+    animation: fadeIn 0.1s ease-out;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+    background: #252526;
+    border: 1px solid #454545;
+    border-radius: 8px;
+    padding: 20px;
+    width: 300px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.modal-content h3 {
+    margin: 0 0 16px 0;
+    font-size: 16px;
+    color: #fff;
+}
+
+.color-picker-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.native-color-picker {
+    width: 50px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.hex-input {
+    flex: 1;
+    background: #333;
+    border: 1px solid #555;
+    color: #fff;
+    padding: 0 8px;
+    border-radius: 4px;
+    font-family: monospace;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.modal-btn {
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.modal-btn.cancel {
+    background: transparent;
+    color: #ccc;
+    border: 1px solid #555;
+}
+
+.modal-btn.cancel:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.modal-btn.apply {
+    background: #007fd4;
     color: white;
-}`, "",{"version":3,"sources":["webpack://./src/webview/index.css"],"names":[],"mappings":"AAAA;IACI,SAAS;IACT,UAAU;IACV,yBAAyB;IACzB,sBAAsB;IACtB,YAAY;IACZ,wIAAwI;AAC5I;;AAEA,6BAA6B;AAC7B,iBAAiB;AACjB,iBAAiB;AACjB;IACI,mBAAmB;IACnB,yBAAyB;IACzB,kBAAkB;IAClB,WAAW;IACX,YAAY;IACZ,kBAAkB;IAClB,wCAAwC;IACxC,yBAAyB;IACzB,sBAAsB;AAC1B;;AAEA;IACI,kBAAkB;IAClB,gBAAgB;AACpB;;AAEA;IACI,qBAAqB;IACrB,6BAA6B;AACjC;;AAEA;IACI,kBAAkB;IAClB,SAAS;IACT,0BAA0B;IAC1B,SAAS;IACT,2BAA2B;IAC3B,eAAe;IACf,cAAc;IACd,mBAAmB;IACnB,iCAAiC;IACjC,gBAAgB;IAChB,kBAAkB;IAClB,oBAAoB;IACpB,WAAW;IACX,yCAAyC;AAC7C;;AAEA;IACI,UAAU;IACV,0CAA0C;AAC9C;;AAEA;IACI,iBAAiB;IACjB,qBAAqB;IACrB,qBAAqB;AACzB;;AAEA;IACI,yBAAyB;IACzB,YAAY;AAChB","sourceRoot":""}]);
+}
+
+.modal-btn.apply:hover {
+    background: #0060a0;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}`, "",{"version":3,"sources":["webpack://./src/webview/index.css"],"names":[],"mappings":"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","sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -32712,6 +32985,8 @@ __webpack_require__(/*! reactflow/dist/style.css */ "./node_modules/reactflow/di
 const uuid_1 = __webpack_require__(/*! uuid */ "./node_modules/uuid/dist/index.js");
 const vscode = acquireVsCodeApi();
 const StationNode_1 = __importDefault(__webpack_require__(/*! ./StationNode */ "./src/webview/StationNode.tsx"));
+const ContextMenu_1 = __importDefault(__webpack_require__(/*! ./ContextMenu */ "./src/webview/ContextMenu.tsx"));
+const ColorPickerModal_1 = __importDefault(__webpack_require__(/*! ./ColorPickerModal */ "./src/webview/ColorPickerModal.tsx"));
 // ... existing code ...
 const nodeTypes = {
     station: StationNode_1.default,
@@ -32728,99 +33003,307 @@ const METRO_COLORS = [
     '#a0a0a0', // Grey
 ];
 const App = () => {
+    var _a;
     const [nodes, setNodes] = (0, reactflow_1.useNodesState)(initialNodes);
     const [edges, setEdges, onEdgesChange] = (0, reactflow_1.useEdgesState)(initialEdges);
     const reactFlowWrapper = (0, react_1.useRef)(null);
+    const [connectionMode, setConnectionMode] = (0, react_1.useState)(false);
+    const [isLoaded, setIsLoaded] = (0, react_1.useState)(false);
+    const [menu, setMenu] = (0, react_1.useState)(null);
+    const [zoomLocked, setZoomLocked] = (0, react_1.useState)(false);
+    const [showColorPicker, setShowColorPicker] = (0, react_1.useState)(false);
+    const { project, fitView, setViewport, getViewport, getNodes, getEdges, setCenter, screenToFlowPosition } = (0, reactflow_1.useReactFlow)();
+    const [shadowNodes, setShadowNodes] = (0, react_1.useState)([]);
+    (0, react_1.useEffect)(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Alt')
+                setConnectionMode(true);
+        };
+        const handleKeyUp = (e) => {
+            if (e.key === 'Alt')
+                setConnectionMode(false);
+        };
+        const handleBlur = () => setConnectionMode(false);
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
+        window.addEventListener('blur', handleBlur);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
+            window.removeEventListener('blur', handleBlur);
+        };
+    }, []);
+    // Save Layout Function
+    const saveLayout = (0, react_1.useCallback)(() => {
+        if (!isLoaded || isRestoring.current)
+            return;
+        const currentViewport = getViewport();
+        const currentNodes = getNodes();
+        const currentEdges = getEdges();
+        // Ensure we NEVER save ghost nodes
+        const cleanNodes = currentNodes.filter(n => !n.id.startsWith('ghost-'));
+        const layout = {
+            nodes: cleanNodes.map(n => ({
+                id: n.id,
+                type: 'file',
+                filePath: n.data.filePath,
+                position: n.position,
+                label: n.data.label,
+                status: n.data.status,
+                color: n.data.color // Save color
+            })),
+            groups: [],
+            edges: currentEdges.map(e => ({
+                id: e.id,
+                source: e.source,
+                target: e.target
+            })),
+            viewport: currentViewport,
+            zoomLocked: zoomLocked
+        };
+        vscode.postMessage({ command: 'saveLayout', layout });
+    }, [isLoaded, zoomLocked, getViewport, getNodes, getEdges]);
     const onNodesChange = (0, react_1.useCallback)((changes) => {
-        setNodes((nds) => (0, reactflow_1.applyNodeChanges)(changes, nds));
-        // Debounce save?
+        // Intercept position changes to enforce snapping on Real Nodes
+        const snappedChanges = changes.map(change => {
+            if (change.type === 'position' && change.position) {
+                return Object.assign(Object.assign({}, change), { position: {
+                        x: Math.round(change.position.x / 40) * 40,
+                        y: Math.round(change.position.y / 40) * 40,
+                    } });
+            }
+            return change;
+        });
+        setNodes((nds) => (0, reactflow_1.applyNodeChanges)(snappedChanges, nds));
     }, [setNodes]);
     const onConnect = (0, react_1.useCallback)((params) => {
-        const color = METRO_COLORS[Math.floor(Math.random() * METRO_COLORS.length)];
-        const newEdge = Object.assign(Object.assign({}, params), { style: { stroke: color, strokeWidth: 4 }, type: 'default' });
-        setEdges((eds) => (0, reactflow_1.addEdge)(newEdge, eds));
-    }, [setEdges]);
+        var _a;
+        // Check if edge already exists
+        const existingEdge = edges.find(e => (e.source === params.source && e.target === params.target) ||
+            (e.source === params.target && e.target === params.source));
+        if (existingEdge) {
+            // Remove existing edge (toggle off)
+            setEdges((eds) => {
+                const newEdges = eds.filter(e => e.id !== existingEdge.id);
+                setTimeout(() => saveLayout(), 0);
+                return newEdges;
+            });
+        }
+        else {
+            // Add new edge (toggle on)
+            const sourceNode = nodes.find(n => n.id === params.source);
+            const color = ((_a = sourceNode === null || sourceNode === void 0 ? void 0 : sourceNode.data) === null || _a === void 0 ? void 0 : _a.color) || METRO_COLORS[Math.floor(Math.random() * METRO_COLORS.length)];
+            const newEdge = Object.assign(Object.assign({}, params), { style: { stroke: color, strokeWidth: 4 }, type: 'straight' });
+            setEdges((eds) => {
+                const newEdges = (0, reactflow_1.addEdge)(newEdge, eds);
+                setTimeout(() => saveLayout(), 0);
+                return newEdges;
+            });
+        }
+    }, [setEdges, nodes, edges, saveLayout]);
+    const isRestoring = (0, react_1.useRef)(false);
     // Handle Messages from Extension
     (0, react_1.useEffect)(() => {
         const handleMessage = (event) => {
             const message = event.data;
             if (message.command === 'updateLayout') {
+                console.log('Received updateLayout message');
+                isRestoring.current = true;
                 const layout = message.layout;
                 // Convert MetroLayout to ReactFlow nodes/edges
                 const newNodes = layout.nodes.map(n => ({
                     id: n.id,
                     type: 'station', // Custom type
                     position: n.position,
-                    data: { label: n.label, filePath: n.filePath, status: n.status },
+                    data: {
+                        label: n.label,
+                        filePath: n.filePath,
+                        status: n.status,
+                        color: n.color, // Restore color
+                        isConnectionMode: false
+                    },
                 }));
                 setNodes(newNodes);
+                // Restore edges
+                if (layout.edges) {
+                    const newEdges = layout.edges.map(e => {
+                        var _a;
+                        // Find source node to get color
+                        const sourceNode = newNodes.find(n => n.id === e.source);
+                        const color = ((_a = sourceNode === null || sourceNode === void 0 ? void 0 : sourceNode.data) === null || _a === void 0 ? void 0 : _a.color) || '#007fd4';
+                        return {
+                            id: e.id,
+                            source: e.source,
+                            target: e.target,
+                            type: 'straight',
+                            style: { stroke: color, strokeWidth: 4 }
+                        };
+                    });
+                    setEdges(newEdges);
+                }
+                // Restore viewport if it exists
+                if (layout.viewport) {
+                    setViewport(layout.viewport);
+                }
+                if (layout.zoomLocked !== undefined) {
+                    setZoomLocked(layout.zoomLocked);
+                }
+                setIsLoaded(true);
+                // Allow saving after a short delay to let viewport settle
+                setTimeout(() => {
+                    isRestoring.current = false;
+                }, 500);
             }
         };
         window.addEventListener('message', handleMessage);
         return () => window.removeEventListener('message', handleMessage);
-    }, [setNodes, setEdges]);
-    // Save Layout
+    }, [setNodes, setEdges, setViewport]);
+    // Update nodes when connection mode changes
     (0, react_1.useEffect)(() => {
-        const layout = {
-            nodes: nodes.map(n => ({
-                id: n.id,
-                type: 'file', // Assuming all are files for now
-                filePath: n.data.filePath,
-                position: n.position,
-                label: n.data.label,
-                status: n.data.status
-            })),
-            groups: [],
-            edges: []
-        };
-        vscode.postMessage({ command: 'saveLayout', layout });
-    }, [nodes, edges]);
+        setNodes((nds) => nds.map(n => (Object.assign(Object.assign({}, n), { data: Object.assign(Object.assign({}, n.data), { isConnectionMode: connectionMode }), draggable: !connectionMode // Disable dragging in connection mode
+         }))));
+    }, [connectionMode, setNodes]);
+    // Purge "ghost" nodes that might have been saved erroneously
+    (0, react_1.useEffect)(() => {
+        setNodes((nds) => {
+            const cleanNodes = nds.filter(n => !n.id.startsWith('ghost-'));
+            if (cleanNodes.length !== nds.length) {
+                console.log('Purged ghost nodes from state');
+                return cleanNodes;
+            }
+            return nds;
+        });
+    }, [setNodes]);
+    const onMoveEnd = (0, react_1.useCallback)((event, viewport) => {
+        if (event) {
+            saveLayout();
+        }
+    }, [saveLayout]);
+    const [dragGhost, setDragGhost] = (0, react_1.useState)(null);
+    const onMiniMapClick = (0, react_1.useCallback)((event, position) => {
+        const { x, y } = position;
+        setCenter(x, y, { zoom: 1, duration: 800 });
+    }, [setCenter]);
+    // Throttled Drag Handlers
+    const lastDragUpdate = (0, react_1.useRef)(0);
+    const onDragEnter = (0, react_1.useCallback)((event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (event.shiftKey) {
+            event.dataTransfer.dropEffect = 'copy';
+        }
+        else {
+            event.dataTransfer.dropEffect = 'none';
+        }
+    }, []);
     const onDragOver = (0, react_1.useCallback)((event) => {
         event.preventDefault();
-        event.dataTransfer.dropEffect = 'move';
+        event.stopPropagation();
+        // VS Code requires Shift to drop into webview.
+        // If Shift is not held, we hide the ghost to indicate drop is not available (or will open file).
+        if (!event.shiftKey) {
+            event.dataTransfer.dropEffect = 'none';
+            setDragGhost(null);
+            return;
+        }
+        event.dataTransfer.dropEffect = 'copy';
+        const now = Date.now();
+        if (now - lastDragUpdate.current < 50)
+            return; // Throttle to 20fps
+        lastDragUpdate.current = now;
+        const position = screenToFlowPosition({
+            x: event.clientX,
+            y: event.clientY
+        });
+        // Snap to grid
+        position.x = Math.round(position.x / 40) * 40;
+        position.y = Math.round(position.y / 40) * 40;
+        setDragGhost(prev => {
+            if (prev && prev.position.x === position.x && prev.position.y === position.y) {
+                return prev;
+            }
+            return {
+                id: 'drag-ghost',
+                type: 'station',
+                position,
+                data: {
+                    label: 'New Station',
+                    status: 'active',
+                    color: '#ffffff',
+                    isGhost: true
+                },
+                style: { pointerEvents: 'none' },
+                draggable: false,
+                zIndex: 1000
+            };
+        });
+    }, [screenToFlowPosition]);
+    const onDragLeave = (0, react_1.useCallback)((event) => {
+        // Only clear ghost if we actually leave the wrapper
+        const wrapper = reactFlowWrapper.current;
+        if (wrapper && wrapper.contains(event.relatedTarget)) {
+            return;
+        }
+        setDragGhost(null);
     }, []);
     const onDrop = (0, react_1.useCallback)((event) => {
-        var _a;
         event.preventDefault();
+        setDragGhost(null); // Clear ghost
         // Check for VS Code D&D data
         // VS Code sends a list of files in 'text/uri-list'
         const data = event.dataTransfer.getData('text/uri-list');
         if (data) {
             const uris = data.split('\r\n').filter(u => u);
-            const reactFlowBounds = (_a = reactFlowWrapper.current) === null || _a === void 0 ? void 0 : _a.getBoundingClientRect();
-            if (reactFlowBounds) {
-                const position = {
-                    x: Math.round((event.clientX - reactFlowBounds.left) / 20) * 20,
-                    y: Math.round((event.clientY - reactFlowBounds.top) / 20) * 20,
+            const position = screenToFlowPosition({
+                x: event.clientX,
+                y: event.clientY
+            });
+            // Snap to grid
+            position.x = Math.round(position.x / 40) * 40;
+            position.y = Math.round(position.y / 40) * 40;
+            const newNodes = uris.map(uri => {
+                let filePath = uri;
+                if (filePath.startsWith('file://')) {
+                    filePath = decodeURIComponent(filePath.replace('file://', ''));
+                }
+                return {
+                    id: (0, uuid_1.v4)(),
+                    type: 'station',
+                    position,
+                    data: {
+                        label: filePath.split('/').pop(),
+                        filePath,
+                        status: 'active',
+                        color: METRO_COLORS[Math.floor(Math.random() * METRO_COLORS.length)]
+                    },
                 };
-                const newNodes = uris.map(uri => {
-                    // uri is like file:///path/to/file
-                    // We need to convert it to a path
-                    // Simple hack for now, better to let extension handle parsing
-                    // But we need immediate feedback.
-                    // Let's assume file://
-                    let filePath = uri;
-                    if (filePath.startsWith('file://')) {
-                        filePath = decodeURIComponent(filePath.replace('file://', ''));
-                    }
-                    return {
-                        id: (0, uuid_1.v4)(),
-                        type: 'station',
-                        position,
-                        data: { label: filePath.split('/').pop(), filePath, status: 'active' },
-                    };
-                });
-                setNodes((nds) => nds.concat(newNodes));
-            }
+            });
+            setNodes((nds) => {
+                const updatedNodes = nds.concat(newNodes);
+                // Save after drop
+                setTimeout(() => saveLayout(), 0);
+                return updatedNodes;
+            });
         }
-    }, [setNodes]);
+    }, [setNodes, saveLayout, screenToFlowPosition]);
     const onNodeClick = (0, react_1.useCallback)((event, node) => {
+        // Single click selects the node (handled by ReactFlow default), no file open
+    }, []);
+    const onNodeDoubleClick = (0, react_1.useCallback)((event, node) => {
         if (node.data.filePath) {
             vscode.postMessage({ command: 'openFile', filePath: node.data.filePath });
         }
     }, []);
-    const [menu, setMenu] = (0, react_1.useState)(null);
-    const { project } = (0, reactflow_1.useReactFlow)();
+    // Restore viewport on load
+    (0, react_1.useEffect)(() => {
+        if (isLoaded && nodes.length > 0) {
+            // We need to wait for nodes to be rendered? 
+            // Actually, we should restore viewport from the layout message
+        }
+    }, [isLoaded]);
+    (0, react_1.useEffect)(() => {
+        vscode.postMessage({ command: 'webviewReady' });
+    }, []);
     const onContextMenu = (0, react_1.useCallback)((event) => {
         var _a;
         event.preventDefault();
@@ -32831,8 +33314,8 @@ const App = () => {
                 y: event.clientY - pane.top,
             });
             // Snap to grid
-            flowPosition.x = Math.round(flowPosition.x / 20) * 20;
-            flowPosition.y = Math.round(flowPosition.y / 20) * 20;
+            flowPosition.x = Math.round(flowPosition.x / 40) * 40;
+            flowPosition.y = Math.round(flowPosition.y / 40) * 40;
             setMenu({
                 x: event.clientX,
                 y: event.clientY,
@@ -32840,31 +33323,234 @@ const App = () => {
             });
         }
     }, [project]);
+    const onNodeContextMenu = (0, react_1.useCallback)((event, node) => {
+        event.preventDefault();
+        event.stopPropagation(); // Prevent pane context menu
+        setMenu({
+            x: event.clientX,
+            y: event.clientY,
+            flowPosition: node.position, // Not used for node menu but keeps type happy
+            nodeId: node.id
+        });
+    }, []);
     const onPaneClick = (0, react_1.useCallback)(() => setMenu(null), []);
     const createNote = (0, react_1.useCallback)(() => {
-        if (menu) {
+        if (menu && !menu.nodeId) {
             vscode.postMessage({ command: 'createNote', position: menu.flowPosition });
             setMenu(null);
         }
     }, [menu]);
-    return ((0, jsx_runtime_1.jsx)("div", { style: { width: '100vw', height: '100vh' }, ref: reactFlowWrapper, children: (0, jsx_runtime_1.jsxs)(reactflow_1.default, { nodes: nodes, edges: edges, onNodesChange: onNodesChange, onEdgesChange: onEdgesChange, onConnect: onConnect, onNodeClick: onNodeClick, onDragOver: onDragOver, onDrop: onDrop, onContextMenu: onContextMenu, onPaneClick: onPaneClick, nodeTypes: nodeTypes, snapToGrid: true, snapGrid: [20, 20], fitView: true, children: [(0, jsx_runtime_1.jsx)(reactflow_1.Controls, {}), (0, jsx_runtime_1.jsx)(reactflow_1.MiniMap, {}), (0, jsx_runtime_1.jsx)(reactflow_1.Background, { variant: reactflow_1.BackgroundVariant.Dots, gap: 20, size: 4, color: "#444" }), menu && ((0, jsx_runtime_1.jsx)("div", { style: {
-                        position: 'absolute',
-                        top: menu.y,
-                        left: menu.x,
-                        zIndex: 1000,
-                        background: '#252526',
-                        border: '1px solid #454545',
-                        borderRadius: '4px',
-                        padding: '4px 0',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
-                    }, children: (0, jsx_runtime_1.jsx)("div", { style: {
-                            padding: '4px 12px',
-                            cursor: 'pointer',
-                            fontSize: '13px',
-                            color: '#cccccc'
-                        }, className: "context-menu-item", onClick: createNote, children: "Create Note" }) }))] }) }));
+    const changeNodeColor = (0, react_1.useCallback)((color) => {
+        if (menu && menu.nodeId) {
+            setNodes((nds) => nds.map(n => {
+                if (n.id === menu.nodeId) {
+                    return Object.assign(Object.assign({}, n), { data: Object.assign(Object.assign({}, n.data), { color }) });
+                }
+                return n;
+            }));
+            // Update outgoing edges to match new color
+            setEdges((eds) => eds.map(e => {
+                if (e.source === menu.nodeId) {
+                    return Object.assign(Object.assign({}, e), { style: Object.assign(Object.assign({}, e.style), { stroke: color }) });
+                }
+                return e;
+            }));
+            setMenu(null);
+            setTimeout(() => saveLayout(), 0);
+        }
+    }, [menu, setNodes, setEdges, saveLayout]);
+    const renameNode = (0, react_1.useCallback)(() => {
+        if (menu && menu.nodeId) {
+            const node = nodes.find(n => n.id === menu.nodeId);
+            if (node) {
+                // Simple prompt for now, could be a custom UI
+                // Since we can't use window.prompt in VSCode webview easily without blocking, 
+                // we'll just use a quick hack or assume we can't do it nicely yet.
+                // Actually, let's just use the VS Code API if possible or a custom input in the menu.
+                // For this step, I'll add an input field to the menu.
+            }
+        }
+    }, [menu, nodes]);
+    const onNodeDragStart = (0, react_1.useCallback)((event, node) => {
+        // 1. Make the Real Node (snapped) look like a ghost
+        setNodes((nds) => nds.map(n => {
+            if (n.id === node.id) {
+                return Object.assign(Object.assign({}, n), { data: Object.assign(Object.assign({}, n.data), { isGhost: true }) });
+            }
+            return n;
+        }));
+        // 2. Create a Solid Ghost Node that follows the mouse
+        setShadowNodes([Object.assign(Object.assign({}, node), { id: `ghost-${node.id}`, data: Object.assign(Object.assign({}, node.data), { label: '', isGhost: false }), zIndex: 100, selected: true, draggable: false, selectable: false, type: 'station' })]);
+    }, [setNodes]);
+    const onNodeDrag = (0, react_1.useCallback)((event, node) => {
+        var _a;
+        const pane = (_a = reactFlowWrapper.current) === null || _a === void 0 ? void 0 : _a.getBoundingClientRect();
+        if (pane) {
+            const flowPos = project({
+                x: event.clientX - pane.left,
+                y: event.clientY - pane.top
+            });
+            setShadowNodes(prev => prev.map(g => (Object.assign(Object.assign({}, g), { position: flowPos }))));
+        }
+    }, [project]);
+    const onNodeDragStop = (0, react_1.useCallback)((event, node) => {
+        setShadowNodes([]);
+        // Restore Real Node opacity
+        setNodes((nds) => nds.map(n => {
+            if (n.id === node.id) {
+                return Object.assign(Object.assign({}, n), { data: Object.assign(Object.assign({}, n.data), { isGhost: false }) });
+            }
+            return n;
+        }));
+        // Save layout after drag is complete
+        setTimeout(() => saveLayout(), 0);
+    }, [setNodes, saveLayout]);
+    // Merge nodes with shadow nodes for rendering
+    // Shadows should be behind
+    const displayNodes = [...shadowNodes, ...(dragGhost ? [dragGhost] : []), ...nodes];
+    const deleteNode = (0, react_1.useCallback)(() => {
+        if (menu && menu.nodeId) {
+            setNodes((nds) => {
+                const updated = nds.filter(n => n.id !== menu.nodeId);
+                setTimeout(() => saveLayout(), 0);
+                return updated;
+            });
+            // Also remove connected edges
+            setEdges((eds) => eds.filter(e => e.source !== menu.nodeId && e.target !== menu.nodeId));
+            setMenu(null);
+        }
+    }, [menu, setNodes, setEdges, saveLayout]);
+    // Menu Items Configuration
+    const getMenuItems = () => {
+        if (!menu)
+            return [];
+        if (menu.nodeId) {
+            return [
+                {
+                    label: 'Rename',
+                    onClick: renameNode
+                },
+                {
+                    label: 'Change Color',
+                    submenu: [
+                        ...METRO_COLORS.map(color => ({
+                            label: color, // Could map hex to name if needed
+                            color: color,
+                            onClick: () => changeNodeColor(color)
+                        })),
+                        {
+                            label: 'Custom Color...',
+                            onClick: () => setShowColorPicker(true)
+                        }
+                    ]
+                },
+                {
+                    label: 'Delete Station',
+                    danger: true,
+                    onClick: deleteNode
+                }
+            ];
+        }
+        else {
+            return [
+                {
+                    label: 'Create Note',
+                    onClick: createNote
+                }
+            ];
+        }
+    };
+    const onConnectStart = (0, react_1.useCallback)(() => {
+        document.body.classList.add('is-connecting');
+    }, []);
+    const onConnectEnd = (0, react_1.useCallback)(() => {
+        document.body.classList.remove('is-connecting');
+    }, []);
+    return ((0, jsx_runtime_1.jsx)("div", { style: { width: '100vw', height: '100vh' }, ref: reactFlowWrapper, className: connectionMode ? 'connection-mode' : '', onDragEnter: onDragEnter, onDragOver: onDragOver, onDragLeave: onDragLeave, onDrop: onDrop, children: (0, jsx_runtime_1.jsxs)(reactflow_1.default, { nodes: displayNodes, edges: edges, onNodesChange: onNodesChange, onEdgesChange: onEdgesChange, onConnect: onConnect, onConnectStart: onConnectStart, onConnectEnd: onConnectEnd, onNodeClick: onNodeClick, onNodeDoubleClick: onNodeDoubleClick, onNodeDragStart: onNodeDragStart, onNodeDrag: onNodeDrag, onNodeDragStop: onNodeDragStop, onContextMenu: onContextMenu, onNodeContextMenu: onNodeContextMenu, onPaneClick: onPaneClick, onMoveEnd: onMoveEnd, nodeTypes: nodeTypes, snapToGrid: false, snapGrid: [40, 40], nodeOrigin: [0.5, 0.5], connectionLineType: reactflow_1.ConnectionLineType.Straight, children: [(0, jsx_runtime_1.jsx)(reactflow_1.Controls, { children: (0, jsx_runtime_1.jsx)(reactflow_1.ControlButton, { onClick: () => setZoomLocked(!zoomLocked), title: zoomLocked ? "Unlock Zoom" : "Lock Zoom", children: zoomLocked ? ((0, jsx_runtime_1.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [(0, jsx_runtime_1.jsx)("rect", { x: "3", y: "11", width: "18", height: "11", rx: "2", ry: "2" }), (0, jsx_runtime_1.jsx)("path", { d: "M7 11V7a5 5 0 0 1 10 0v4" })] })) : ((0, jsx_runtime_1.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [(0, jsx_runtime_1.jsx)("rect", { x: "3", y: "11", width: "18", height: "11", rx: "2", ry: "2" }), (0, jsx_runtime_1.jsx)("path", { d: "M7 11V7a5 5 0 0 1 9.9-1" })] })) }) }), (0, jsx_runtime_1.jsx)(reactflow_1.MiniMap, { nodeColor: (n) => {
+                        if (n.type === 'station')
+                            return n.data.color || '#007fd4';
+                        return '#eee';
+                    }, nodeStrokeWidth: 3, nodeStrokeColor: (n) => {
+                        if (n.type === 'station')
+                            return n.data.color || '#007fd4';
+                        return '#fff';
+                    }, nodeBorderRadius: 50, maskColor: "rgba(0, 0, 0, 0.6)", style: {
+                        backgroundColor: '#1e1e1e',
+                        border: '1px solid #333',
+                        borderRadius: '8px',
+                        height: 150,
+                        width: 200
+                    }, zoomable: true, pannable: true, onClick: onMiniMapClick }), (0, jsx_runtime_1.jsx)(reactflow_1.Background, { variant: reactflow_1.BackgroundVariant.Dots, gap: 40, size: 10, color: "#333" }), (0, jsx_runtime_1.jsxs)(reactflow_1.Panel, { position: "top-right", style: { display: 'flex', gap: '10px', alignItems: 'center' }, children: [(0, jsx_runtime_1.jsxs)("div", { style: { color: '#aaa', fontSize: '12px', background: 'rgba(0,0,0,0.5)', padding: '5px 10px', borderRadius: '4px', pointerEvents: 'none' }, children: ["Hold ", (0, jsx_runtime_1.jsx)("b", { children: "Option/Alt" }), " to Connect"] }), (0, jsx_runtime_1.jsx)("button", { onClick: () => {
+                                if (zoomLocked) {
+                                    // If zoom locked, we only center, keeping current zoom
+                                    const currentZoom = getViewport().zoom;
+                                    fitView({ duration: 800, minZoom: currentZoom, maxZoom: currentZoom });
+                                }
+                                else {
+                                    fitView({ duration: 800 });
+                                }
+                            }, style: {
+                                background: '#252526',
+                                color: '#cccccc',
+                                border: '1px solid #454545',
+                                borderRadius: '4px',
+                                padding: '5px 10px',
+                                cursor: 'pointer',
+                                fontSize: '12px'
+                            }, children: "Reset View" })] }), menu && ((0, jsx_runtime_1.jsx)(ContextMenu_1.default, { x: menu.x, y: menu.y, items: getMenuItems(), onClose: () => setMenu(null) })), showColorPicker && (menu === null || menu === void 0 ? void 0 : menu.nodeId) && ((0, jsx_runtime_1.jsx)(ColorPickerModal_1.default, { initialColor: ((_a = nodes.find(n => n.id === menu.nodeId)) === null || _a === void 0 ? void 0 : _a.data.color) || '#007fd4', onApply: (color) => {
+                        changeNodeColor(color);
+                        setShowColorPicker(false);
+                        setMenu(null);
+                    }, onCancel: () => setShowColorPicker(false) }))] }) }));
 };
 exports["default"] = () => ((0, jsx_runtime_1.jsx)(reactflow_1.ReactFlowProvider, { children: (0, jsx_runtime_1.jsx)(App, {}) }));
+
+
+/***/ }),
+
+/***/ "./src/webview/ColorPickerModal.tsx":
+/*!******************************************!*\
+  !*** ./src/webview/ColorPickerModal.tsx ***!
+  \******************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const jsx_runtime_1 = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+const react_1 = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+const ColorPickerModal = ({ initialColor, onApply, onCancel }) => {
+    const [color, setColor] = (0, react_1.useState)(initialColor);
+    return ((0, jsx_runtime_1.jsx)("div", { className: "modal-overlay", children: (0, jsx_runtime_1.jsxs)("div", { className: "modal-content", children: [(0, jsx_runtime_1.jsx)("h3", { children: "Select Custom Color" }), (0, jsx_runtime_1.jsxs)("div", { className: "color-picker-container", children: [(0, jsx_runtime_1.jsx)("input", { type: "color", value: color, onChange: (e) => setColor(e.target.value), className: "native-color-picker" }), (0, jsx_runtime_1.jsx)("input", { type: "text", value: color, onChange: (e) => setColor(e.target.value), className: "hex-input" })] }), (0, jsx_runtime_1.jsxs)("div", { className: "modal-actions", children: [(0, jsx_runtime_1.jsx)("button", { onClick: onCancel, className: "modal-btn cancel", children: "Cancel" }), (0, jsx_runtime_1.jsx)("button", { onClick: () => onApply(color), className: "modal-btn apply", children: "Apply" })] })] }) }));
+};
+exports["default"] = ColorPickerModal;
+
+
+/***/ }),
+
+/***/ "./src/webview/ContextMenu.tsx":
+/*!*************************************!*\
+  !*** ./src/webview/ContextMenu.tsx ***!
+  \*************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const jsx_runtime_1 = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+const react_1 = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+const ContextMenu = ({ x, y, items, onClose }) => {
+    return ((0, jsx_runtime_1.jsx)("div", { className: "context-menu", style: { top: y, left: x }, onMouseLeave: onClose, children: items.map((item, index) => ((0, jsx_runtime_1.jsx)(ContextMenuItem, { item: item }, index))) }));
+};
+const ContextMenuItem = ({ item }) => {
+    const [showSubmenu, setShowSubmenu] = (0, react_1.useState)(false);
+    return ((0, jsx_runtime_1.jsxs)("div", { className: `context-menu-item ${item.danger ? 'danger' : ''}`, onClick: () => {
+            if (item.onClick) {
+                item.onClick();
+            }
+        }, onMouseEnter: () => setShowSubmenu(true), onMouseLeave: () => setShowSubmenu(false), children: [(0, jsx_runtime_1.jsxs)("div", { className: "menu-item-content", children: [item.color && ((0, jsx_runtime_1.jsx)("span", { className: "color-preview", style: { backgroundColor: item.color } })), (0, jsx_runtime_1.jsx)("span", { children: item.label })] }), item.submenu && (0, jsx_runtime_1.jsx)("span", { className: "submenu-arrow", children: "\u203A" }), item.submenu && showSubmenu && ((0, jsx_runtime_1.jsx)("div", { className: "context-submenu", children: item.submenu.map((subItem, index) => ((0, jsx_runtime_1.jsx)(ContextMenuItem, { item: subItem }, index))) }))] }));
+};
+exports["default"] = ContextMenu;
 
 
 /***/ }),
@@ -32882,7 +33568,11 @@ const jsx_runtime_1 = __webpack_require__(/*! react/jsx-runtime */ "./node_modul
 const react_1 = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 const reactflow_1 = __webpack_require__(/*! reactflow */ "./node_modules/reactflow/dist/umd/index.js");
 const StationNode = ({ data, selected }) => {
-    return ((0, jsx_runtime_1.jsxs)("div", { className: `station-node ${selected ? 'selected' : ''} ${data.status === 'missing' ? 'missing' : ''}`, children: [(0, jsx_runtime_1.jsx)(reactflow_1.Handle, { type: "target", position: reactflow_1.Position.Top, className: "station-handle" }), (0, jsx_runtime_1.jsx)(reactflow_1.Handle, { type: "source", position: reactflow_1.Position.Bottom, className: "station-handle" }), (0, jsx_runtime_1.jsx)("div", { className: "station-label", children: data.label })] }));
+    const style = data.color ? {
+        borderColor: data.color,
+        boxShadow: `0 0 0 2px ${data.color}33` // Subtle glow with same color
+    } : {};
+    return ((0, jsx_runtime_1.jsxs)("div", { className: `station-node ${selected ? 'selected' : ''} ${data.status === 'missing' ? 'missing' : ''} ${data.isConnectionMode ? 'connection-target' : ''} ${data.isGhost ? 'ghost' : ''}`, style: style, children: [(0, jsx_runtime_1.jsx)(reactflow_1.Handle, { type: "target", position: reactflow_1.Position.Top, className: "station-handle center target" }), (0, jsx_runtime_1.jsx)(reactflow_1.Handle, { type: "source", position: reactflow_1.Position.Top, className: "station-handle center source" }), (0, jsx_runtime_1.jsx)("div", { className: "station-label", children: data.label })] }));
 };
 exports["default"] = (0, react_1.memo)(StationNode);
 
@@ -32956,12 +33646,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const jsx_runtime_1 = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
 const client_1 = __webpack_require__(/*! react-dom/client */ "./node_modules/react-dom/client.js");
+const reactflow_1 = __webpack_require__(/*! reactflow */ "./node_modules/reactflow/dist/umd/index.js");
 const App_1 = __importDefault(__webpack_require__(/*! ./App */ "./src/webview/App.tsx"));
 __webpack_require__(/*! ./index.css */ "./src/webview/index.css");
 const container = document.getElementById('root');
 if (container) {
     const root = (0, client_1.createRoot)(container);
-    root.render((0, jsx_runtime_1.jsx)(App_1.default, {}));
+    root.render((0, jsx_runtime_1.jsx)(reactflow_1.ReactFlowProvider, { children: (0, jsx_runtime_1.jsx)(App_1.default, {}) }));
 }
 
 
