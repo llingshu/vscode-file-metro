@@ -797,7 +797,6 @@ class FileTracker {
                 fs.mkdirSync(vscodeDir);
             }
             this.layoutFilePath = path.join(vscodeDir, 'metro-layout.json');
-            console.log('FileTracker initialized. Layout path:', this.layoutFilePath);
             this.loadLayout();
         }
     }
@@ -841,7 +840,6 @@ class FileTracker {
     saveLayout(layout) {
         this.currentLayout = layout;
         if (this.layoutFilePath) {
-            console.log('Saving layout to:', this.layoutFilePath);
             fs.writeFileSync(this.layoutFilePath, JSON.stringify(layout, null, 2));
         }
     }
@@ -891,6 +889,23 @@ class FileTracker {
             this.saveLayout(this.currentLayout);
         }
         return changed;
+    }
+    renameFile(nodeId, oldPath, newName) {
+        const dir = path.dirname(oldPath);
+        const newPath = path.join(dir, newName);
+        try {
+            fs.renameSync(oldPath, newPath);
+            // Update node in layout
+            const node = this.currentLayout.nodes.find(n => n.id === nodeId);
+            if (node) {
+                node.filePath = newPath;
+                node.label = newName;
+                this.saveLayout(this.currentLayout);
+            }
+        }
+        catch (error) {
+            vscode.window.showErrorMessage(`Failed to rename file: ${error}`);
+        }
     }
 }
 exports.FileTracker = FileTracker;
@@ -951,6 +966,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.MetroViewPanel = void 0;
 const vscode = __importStar(__webpack_require__(/*! vscode */ "vscode"));
 const fs = __importStar(__webpack_require__(/*! fs */ "fs"));
+const path = __importStar(__webpack_require__(/*! path */ "path"));
 class MetroViewPanel {
     static createOrShow(extensionUri, fileTracker) {
         const column = vscode.window.activeTextEditor
@@ -978,17 +994,25 @@ class MetroViewPanel {
         this._panel.webview.onDidReceiveMessage(message => {
             switch (message.command) {
                 case 'saveLayout':
-                    console.log('Received saveLayout message from webview');
                     this._fileTracker.saveLayout(message.layout);
                     return;
                 case 'openFile':
-                    this.openFile(message.filePath);
+                    vscode.commands.executeCommand('vscode.open', vscode.Uri.file(message.filePath));
                     return;
                 case 'createNote':
-                    const newNode = this._fileTracker.createNote(message.position);
-                    if (newNode) {
-                        this.updateLayout(this._fileTracker.getLayout());
-                    }
+                    this._fileTracker.createNote(message.position);
+                    this.updateLayout(this._fileTracker.getLayout());
+                    return;
+                case 'renameNode':
+                    vscode.window.showInputBox({
+                        prompt: 'Enter new name',
+                        value: path.basename(message.oldPath)
+                    }).then(newName => {
+                        if (newName) {
+                            this._fileTracker.renameFile(message.id, message.oldPath, newName);
+                            this.updateLayout(this._fileTracker.getLayout());
+                        }
+                    });
                     return;
                 case 'webviewReady':
                     this.updateLayout(this._fileTracker.getLayout());
@@ -1035,6 +1059,7 @@ class MetroViewPanel {
     _getHtmlForWebview(webview) {
         const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'dist', 'webview.js'));
         const nonce = getNonce();
+        const config = vscode.workspace.getConfiguration('metro');
         return `<!DOCTYPE html>
             <html lang="en">
             <head>
@@ -1044,6 +1069,11 @@ class MetroViewPanel {
                 <style>
                     body { padding: 0; margin: 0; width: 100%; height: 100vh; overflow: hidden; }
                 </style>
+                <script nonce="${nonce}">
+                    window.initialConfig = {
+                        showInactiveStations: ${config.get('showInactiveStations', true)}
+                    };
+                </script>
             </head>
             <body>
                 <div id="root" style="width: 100%; height: 100%;"></div>
@@ -1113,7 +1143,6 @@ const vscode = __importStar(__webpack_require__(/*! vscode */ "vscode"));
 const FileTracker_1 = __webpack_require__(/*! ./FileTracker */ "./src/FileTracker.ts");
 const MetroViewPanel_1 = __webpack_require__(/*! ./MetroViewPanel */ "./src/MetroViewPanel.ts");
 function activate(context) {
-    console.log('Metro View is now active!');
     const fileTracker = new FileTracker_1.FileTracker();
     context.subscriptions.push(vscode.commands.registerCommand('metro.open', () => {
         MetroViewPanel_1.MetroViewPanel.createOrShow(context.extensionUri, fileTracker);

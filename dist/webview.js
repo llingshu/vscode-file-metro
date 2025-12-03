@@ -457,76 +457,64 @@ var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBP
 ___CSS_LOADER_EXPORT___.push([module.id, `body {
     margin: 0;
     padding: 0;
-    background-color: #1e1e1e;
-    /* Dark mode default */
-    color: white;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background-color: var(--vscode-editor-background);
+    color: var(--vscode-editor-foreground);
+    font-family: var(--vscode-font-family);
 }
 
 /* React Flow Customization */
 /* Station Node */
-/* Station Node */
 .station-node {
-    background: #ffffff;
+    background: var(--vscode-editor-background);
     border: 4px solid #007fd4;
-    /* Thicker border */
+    /* Keep blue border for identity */
     border-radius: 50%;
     width: 20px;
-    /* Slightly larger */
     height: 20px;
     position: relative;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    /* Stronger shadow */
     transition: all 0.2s ease;
     box-sizing: border-box;
     z-index: 10;
     cursor: move;
-    /* Default move cursor */
 }
 
 .station-node.missing {
-    border-color: #666;
-    background: #ccc;
+    border-color: var(--vscode-disabledForeground);
+    background: var(--vscode-editor-inactiveSelectionBackground);
 }
 
 .station-node.selected {
-    /* border-color: #ffffff; Removed to prevent "all white" look */
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
-    /* Subtle glow instead */
+    box-shadow: 0 0 0 2px var(--vscode-focusBorder);
 }
 
 .station-node.ghost {
     opacity: 0.4;
     border-style: solid;
-    /* Solid but transparent looks better than broken dashed */
-    background: rgba(255, 255, 255, 0.5);
+    background: var(--vscode-editor-background);
     pointer-events: none;
     z-index: 1;
-    /* Behind everything */
 }
 
 .station-label {
     position: absolute;
     top: 24px;
-    /* 20px height + 4px gap */
     left: 50%;
     transform: translateX(-50%);
     font-size: 11px;
-    color: #cccccc;
+    color: var(--vscode-editor-foreground);
     white-space: nowrap;
-    background: rgba(30, 30, 30, 0.8);
+    background: var(--vscode-editor-widget-background);
     padding: 1px 4px;
     border-radius: 3px;
     pointer-events: none;
     z-index: 10;
-    /* Ensure label is above other elements */
+    border: 1px solid var(--vscode-widget-border);
 }
 
 .station-handle {
     opacity: 0;
-    /* Hide handles but keep them functional */
     pointer-events: none !important;
-    /* Disable connections by default */
 }
 
 .station-handle.center {
@@ -560,13 +548,11 @@ ___CSS_LOADER_EXPORT___.push([module.id, `body {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 20px;
-    /* Full node size */
     height: 20px;
     border-radius: 50%;
     background: transparent;
     cursor: crosshair;
     pointer-events: none;
-    /* Default: Pass through to node for dragging */
 }
 
 /* Target Handle: Large Outer Ring (End Drag) */
@@ -577,12 +563,10 @@ ___CSS_LOADER_EXPORT___.push([module.id, `body {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 32px;
-    /* Large catch area */
     height: 32px;
     border-radius: 50%;
     background: transparent;
     pointer-events: none;
-    /* Default: Pass through to node for dragging */
 }
 
 /* Enable Source Handle when Alt is held (Connection Mode) */
@@ -602,7 +586,6 @@ body.is-connecting .station-handle.center.source,
 body.is-connecting .station-handle.center.source::after {
     pointer-events: none !important;
     display: none !important;
-    /* Ensure it's gone */
 }
 
 .connection-mode .station-node {
@@ -611,13 +594,11 @@ body.is-connecting .station-handle.center.source::after {
 
 .connection-mode .station-handle {
     pointer-events: auto !important;
-    /* Enable connections when Alt is pressed */
     cursor: crosshair;
 }
 
 .react-flow__edge-path {
     stroke-width: 4px;
-    /* Thick metro line */
     stroke-linecap: round;
 }
 
@@ -625,21 +606,21 @@ body.is-connecting .station-handle.center.source::after {
 .context-menu {
     position: fixed;
     z-index: 1000;
-    background: rgba(30, 30, 30, 0.95);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
+    background: var(--vscode-menu-background);
+    border: 1px solid var(--vscode-menu-border);
+    border-radius: 4px;
     padding: 4px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     min-width: 180px;
     animation: fadeIn 0.1s ease-out;
+    color: var(--vscode-menu-foreground);
 }
 
 .context-menu-item {
     padding: 8px 12px;
     cursor: pointer;
     font-size: 13px;
-    color: #e0e0e0;
+    color: var(--vscode-menu-foreground);
     border-radius: 4px;
     display: flex;
     justify-content: space-between;
@@ -649,15 +630,17 @@ body.is-connecting .station-handle.center.source::after {
 }
 
 .context-menu-item:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: var(--vscode-menu-selectionBackground);
+    color: var(--vscode-menu-selectionForeground);
 }
 
 .context-menu-item.danger {
-    color: #ff4d4d;
+    color: var(--vscode-errorForeground);
 }
 
 .context-menu-item.danger:hover {
-    background-color: rgba(255, 77, 77, 0.1);
+    background-color: var(--vscode-button-secondaryHoverBackground);
+    /* Just a guess, or keep custom red */
 }
 
 .menu-item-content {
@@ -670,12 +653,13 @@ body.is-connecting .station-handle.center.source::after {
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid var(--vscode-widget-border);
 }
 
 .submenu-arrow {
     font-size: 10px;
-    color: #888;
+    color: var(--vscode-menu-foreground);
+    opacity: 0.7;
 }
 
 /* Submenu */
@@ -684,10 +668,9 @@ body.is-connecting .station-handle.center.source::after {
     top: 0;
     left: 100%;
     margin-left: 4px;
-    background: rgba(30, 30, 30, 0.95);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
+    background: var(--vscode-menu-background);
+    border: 1px solid var(--vscode-menu-border);
+    border-radius: 4px;
     padding: 4px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     min-width: 150px;
@@ -710,18 +693,19 @@ body.is-connecting .station-handle.center.source::after {
 }
 
 .modal-content {
-    background: #252526;
-    border: 1px solid #454545;
+    background: var(--vscode-editor-widget-background);
+    border: 1px solid var(--vscode-widget-border);
     border-radius: 8px;
     padding: 20px;
     width: 300px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    color: var(--vscode-editor-foreground);
 }
 
 .modal-content h3 {
     margin: 0 0 16px 0;
     font-size: 16px;
-    color: #fff;
+    color: var(--vscode-editor-foreground);
 }
 
 .color-picker-container {
@@ -741,9 +725,9 @@ body.is-connecting .station-handle.center.source::after {
 
 .hex-input {
     flex: 1;
-    background: #333;
-    border: 1px solid #555;
-    color: #fff;
+    background: var(--vscode-input-background);
+    border: 1px solid var(--vscode-input-border);
+    color: var(--vscode-input-foreground);
     padding: 0 8px;
     border-radius: 4px;
     font-family: monospace;
@@ -764,22 +748,22 @@ body.is-connecting .station-handle.center.source::after {
 }
 
 .modal-btn.cancel {
-    background: transparent;
-    color: #ccc;
-    border: 1px solid #555;
+    background: var(--vscode-button-secondaryBackground);
+    color: var(--vscode-button-secondaryForeground);
+    border: 1px solid var(--vscode-button-border);
 }
 
 .modal-btn.cancel:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--vscode-button-secondaryHoverBackground);
 }
 
 .modal-btn.apply {
-    background: #007fd4;
-    color: white;
+    background: var(--vscode-button-background);
+    color: var(--vscode-button-foreground);
 }
 
 .modal-btn.apply:hover {
-    background: #0060a0;
+    background: var(--vscode-button-hoverBackground);
 }
 
 @keyframes fadeIn {
@@ -808,22 +792,25 @@ body.is-connecting .station-handle.center.source::after {
 }
 
 .station-mark.mark-default {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.2);
     /* Background color is set inline to match station color */
+    background-color: #007fd4;
+    /* Fallback */
 }
 
 .station-mark.mark-check {
-    color: #4caf50;
+    color: var(--vscode-testing-iconPassed);
     font-size: 14px;
     font-weight: bold;
 }
 
 .station-mark.mark-star {
-    color: #ffc107;
+    color: var(--vscode-editorWarning-foreground);
     font-size: 14px;
-}`, "",{"version":3,"sources":["webpack://./src/webview/index.css"],"names":[],"mappings":"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","sourceRoot":""}]);
+}`, "",{"version":3,"sources":["webpack://./src/webview/index.css"],"names":[],"mappings":"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","sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -33034,7 +33021,7 @@ const METRO_COLORS = [
     '#a0a0a0', // Grey
 ];
 const App = () => {
-    var _a;
+    var _a, _b, _c;
     const [nodes, setNodes] = (0, reactflow_1.useNodesState)(initialNodes);
     const [edges, setEdges, onEdgesChange] = (0, reactflow_1.useEdgesState)(initialEdges);
     const reactFlowWrapper = (0, react_1.useRef)(null);
@@ -33045,6 +33032,7 @@ const App = () => {
     const [showColorPicker, setShowColorPicker] = (0, react_1.useState)(false);
     const { project, fitView, setViewport, getViewport, getNodes, getEdges, setCenter, screenToFlowPosition } = (0, reactflow_1.useReactFlow)();
     const [shadowNodes, setShadowNodes] = (0, react_1.useState)([]);
+    const [showInactiveStations, setShowInactiveStations] = (0, react_1.useState)((_b = (_a = window.initialConfig) === null || _a === void 0 ? void 0 : _a.showInactiveStations) !== null && _b !== void 0 ? _b : true);
     (0, react_1.useEffect)(() => {
         const handleKeyDown = (e) => {
             if (e.key === 'Alt')
@@ -33081,7 +33069,8 @@ const App = () => {
                 position: n.position,
                 label: n.data.label,
                 status: n.data.status,
-                color: n.data.color // Save color
+                color: n.data.color, // Save color
+                mark: n.data.mark // Save mark
             })),
             groups: [],
             edges: currentEdges.map(e => ({
@@ -33155,8 +33144,13 @@ const App = () => {
     const renameNode = (0, react_1.useCallback)(() => {
         if (menu && menu.nodeId) {
             const node = nodes.find(n => n.id === menu.nodeId);
-            if (node) {
-                // Simple prompt for now
+            if (node && node.data.filePath) {
+                vscode.postMessage({
+                    command: 'renameNode',
+                    id: node.id,
+                    oldPath: node.data.filePath
+                });
+                setMenu(null);
             }
         }
     }, [menu, nodes]);
@@ -33204,7 +33198,6 @@ const App = () => {
         const handleMessage = (event) => {
             const message = event.data;
             if (message.command === 'updateLayout') {
-                console.log('Received updateLayout message');
                 isRestoring.current = true;
                 const layout = message.layout;
                 // Convert MetroLayout to ReactFlow nodes/edges
@@ -33217,6 +33210,7 @@ const App = () => {
                         filePath: n.filePath,
                         status: n.status,
                         color: n.color, // Restore color
+                        mark: n.mark, // Restore mark
                         isConnectionMode: false
                     },
                 }));
@@ -33265,7 +33259,6 @@ const App = () => {
         setNodes((nds) => {
             const cleanNodes = nds.filter(n => !n.id.startsWith('ghost-'));
             if (cleanNodes.length !== nds.length) {
-                console.log('Purged ghost nodes from state');
                 return cleanNodes;
             }
             return nds;
@@ -33398,9 +33391,7 @@ const App = () => {
         }
     }, [setNodes, saveLayout]);
     const onNodeDoubleClick = (0, react_1.useCallback)((event, node) => {
-        console.log('Double clicked node:', node);
         if (node.data.filePath) {
-            console.log('Sending openFile command for:', node.data.filePath);
             vscode.postMessage({ command: 'openFile', filePath: node.data.filePath });
         }
         else {
@@ -33666,7 +33657,9 @@ const App = () => {
     const onConnectEnd = (0, react_1.useCallback)(() => {
         document.body.classList.remove('is-connecting');
     }, []);
-    return ((0, jsx_runtime_1.jsx)("div", { style: { width: '100vw', height: '100vh' }, ref: reactFlowWrapper, className: connectionMode ? 'connection-mode' : '', onDragEnter: onDragEnter, onDragOver: onDragOver, onDragLeave: onDragLeave, onDrop: onDrop, children: (0, jsx_runtime_1.jsxs)(reactflow_1.default, { nodes: displayNodes, edges: edges, onNodesChange: onNodesChange, onEdgesChange: onEdgesChange, onConnect: onConnect, onConnectStart: onConnectStart, onConnectEnd: onConnectEnd, onNodeClick: onNodeClick, onNodeDoubleClick: onNodeDoubleClick, onNodeDragStart: onNodeDragStart, onNodeDrag: onNodeDrag, onNodeDragStop: onNodeDragStop, onContextMenu: onContextMenu, onNodeContextMenu: onNodeContextMenu, onPaneClick: onPaneClick, onMoveEnd: onMoveEnd, nodeTypes: nodeTypes, snapToGrid: false, snapGrid: [40, 40], nodeOrigin: [0.5, 0.5], connectionLineType: reactflow_1.ConnectionLineType.Straight, children: [(0, jsx_runtime_1.jsx)(reactflow_1.Controls, { children: (0, jsx_runtime_1.jsx)(reactflow_1.ControlButton, { onClick: () => setZoomLocked(!zoomLocked), title: zoomLocked ? "Unlock Zoom" : "Lock Zoom", children: zoomLocked ? ((0, jsx_runtime_1.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [(0, jsx_runtime_1.jsx)("rect", { x: "3", y: "11", width: "18", height: "11", rx: "2", ry: "2" }), (0, jsx_runtime_1.jsx)("path", { d: "M7 11V7a5 5 0 0 1 10 0v4" })] })) : ((0, jsx_runtime_1.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [(0, jsx_runtime_1.jsx)("rect", { x: "3", y: "11", width: "18", height: "11", rx: "2", ry: "2" }), (0, jsx_runtime_1.jsx)("path", { d: "M7 11V7a5 5 0 0 1 9.9-1" })] })) }) }), (0, jsx_runtime_1.jsx)(reactflow_1.MiniMap, { nodeColor: (n) => {
+    return ((0, jsx_runtime_1.jsx)("div", { style: { width: '100vw', height: '100vh' }, ref: reactFlowWrapper, className: connectionMode ? 'connection-mode' : '', onDragEnter: onDragEnter, onDragOver: onDragOver, onDragLeave: onDragLeave, onDrop: onDrop, children: (0, jsx_runtime_1.jsxs)(reactflow_1.default, { nodes: displayNodes, edges: edges, onNodesChange: onNodesChange, onEdgesChange: onEdgesChange, onConnect: onConnect, onConnectStart: onConnectStart, onConnectEnd: onConnectEnd, onNodeClick: onNodeClick, onNodeDoubleClick: onNodeDoubleClick, onNodeDragStart: onNodeDragStart, onNodeDrag: onNodeDrag, onNodeDragStop: onNodeDragStop, onContextMenu: onContextMenu, onNodeContextMenu: onNodeContextMenu, onPaneClick: onPaneClick, onMoveEnd: onMoveEnd, nodeTypes: nodeTypes, snapToGrid: false, snapGrid: [40, 40], nodeOrigin: [0.5, 0.5], connectionLineType: reactflow_1.ConnectionLineType.Straight, 
+            // Zoom Lock Logic
+            zoomOnScroll: !zoomLocked, zoomOnPinch: !zoomLocked, zoomOnDoubleClick: !zoomLocked, children: [(0, jsx_runtime_1.jsx)(reactflow_1.Controls, { showInteractive: false, children: (0, jsx_runtime_1.jsx)(reactflow_1.ControlButton, { onClick: () => setZoomLocked(!zoomLocked), title: zoomLocked ? "Unlock Zoom" : "Lock Zoom", children: zoomLocked ? ((0, jsx_runtime_1.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [(0, jsx_runtime_1.jsx)("rect", { x: "3", y: "11", width: "18", height: "11", rx: "2", ry: "2" }), (0, jsx_runtime_1.jsx)("path", { d: "M7 11V7a5 5 0 0 1 10 0v4" })] })) : ((0, jsx_runtime_1.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [(0, jsx_runtime_1.jsx)("rect", { x: "3", y: "11", width: "18", height: "11", rx: "2", ry: "2" }), (0, jsx_runtime_1.jsx)("path", { d: "M7 11V7a5 5 0 0 1 9.9-1" })] })) }) }), (0, jsx_runtime_1.jsx)(reactflow_1.MiniMap, { nodeColor: (n) => {
                         if (n.type === 'station')
                             return n.data.color || '#007fd4';
                         return '#eee';
@@ -33674,13 +33667,13 @@ const App = () => {
                         if (n.type === 'station')
                             return n.data.color || '#007fd4';
                         return '#fff';
-                    }, nodeBorderRadius: 50, maskColor: "rgba(0, 0, 0, 0.6)", style: {
-                        backgroundColor: '#1e1e1e',
-                        border: '1px solid #333',
+                    }, nodeBorderRadius: 50, maskColor: "var(--vscode-editor-background)", style: {
+                        backgroundColor: 'var(--vscode-editor-background)',
+                        border: '1px solid var(--vscode-widget-border)',
                         borderRadius: '8px',
                         height: 150,
                         width: 200
-                    }, zoomable: true, pannable: true, onClick: onMiniMapClick }), (0, jsx_runtime_1.jsx)(reactflow_1.Background, { variant: reactflow_1.BackgroundVariant.Dots, gap: 40, size: 10, color: "#333" }), (0, jsx_runtime_1.jsxs)(reactflow_1.Panel, { position: "top-right", style: { display: 'flex', gap: '10px', alignItems: 'center' }, children: [(0, jsx_runtime_1.jsxs)("div", { style: { color: '#aaa', fontSize: '12px', background: 'rgba(0,0,0,0.5)', padding: '5px 10px', borderRadius: '4px', pointerEvents: 'none' }, children: ["Hold ", (0, jsx_runtime_1.jsx)("b", { children: "Option/Alt" }), " to Connect"] }), (0, jsx_runtime_1.jsx)("button", { onClick: () => {
+                    }, zoomable: true, pannable: true, onClick: onMiniMapClick }), showInactiveStations && ((0, jsx_runtime_1.jsx)(reactflow_1.Background, { variant: reactflow_1.BackgroundVariant.Dots, gap: 40, size: 6, color: "var(--vscode-scrollbarSlider-background)" })), (0, jsx_runtime_1.jsxs)(reactflow_1.Panel, { position: "top-right", style: { display: 'flex', gap: '10px', alignItems: 'center' }, children: [(0, jsx_runtime_1.jsxs)("div", { style: { color: 'var(--vscode-descriptionForeground)', fontSize: '12px', background: 'var(--vscode-editor-background)', padding: '5px 10px', borderRadius: '4px', pointerEvents: 'none', border: '1px solid var(--vscode-widget-border)' }, children: ["Hold ", (0, jsx_runtime_1.jsx)("b", { children: "Option/Alt" }), " to Connect"] }), (0, jsx_runtime_1.jsx)("button", { onClick: () => {
                                 if (zoomLocked) {
                                     // If zoom locked, we only center, keeping current zoom
                                     const currentZoom = getViewport().zoom;
@@ -33690,14 +33683,14 @@ const App = () => {
                                     fitView({ duration: 800 });
                                 }
                             }, style: {
-                                background: '#252526',
-                                color: '#cccccc',
-                                border: '1px solid #454545',
+                                background: 'var(--vscode-button-secondaryBackground)',
+                                color: 'var(--vscode-button-secondaryForeground)',
+                                border: '1px solid var(--vscode-button-border)',
                                 borderRadius: '4px',
                                 padding: '5px 10px',
                                 cursor: 'pointer',
                                 fontSize: '12px'
-                            }, children: "Reset View" })] }), menu && ((0, jsx_runtime_1.jsx)(ContextMenu_1.default, { x: menu.x, y: menu.y, items: getMenuItems(), onClose: () => setMenu(null) })), showColorPicker && (menu === null || menu === void 0 ? void 0 : menu.nodeId) && ((0, jsx_runtime_1.jsx)(ColorPickerModal_1.default, { initialColor: ((_a = nodes.find(n => n.id === menu.nodeId)) === null || _a === void 0 ? void 0 : _a.data.color) || '#007fd4', onApply: (color) => {
+                            }, children: "Reset View" })] }), menu && ((0, jsx_runtime_1.jsx)(ContextMenu_1.default, { x: menu.x, y: menu.y, items: getMenuItems(), onClose: () => setMenu(null) })), showColorPicker && (menu === null || menu === void 0 ? void 0 : menu.nodeId) && ((0, jsx_runtime_1.jsx)(ColorPickerModal_1.default, { initialColor: ((_c = nodes.find(n => n.id === menu.nodeId)) === null || _c === void 0 ? void 0 : _c.data.color) || '#007fd4', onApply: (color) => {
                         changeNodeColor(color);
                         setShowColorPicker(false);
                         setMenu(null);
@@ -33732,23 +33725,74 @@ exports["default"] = ColorPickerModal;
 /*!*************************************!*\
   !*** ./src/webview/ContextMenu.tsx ***!
   \*************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const jsx_runtime_1 = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
-const react_1 = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+const react_1 = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
 const ContextMenu = ({ x, y, items, onClose }) => {
-    return ((0, jsx_runtime_1.jsx)("div", { className: "context-menu", style: { top: y, left: x }, children: items.map((item, index) => ((0, jsx_runtime_1.jsx)(ContextMenuItem, { item: item }, index))) }));
+    const [activeSubmenuIndex, setActiveSubmenuIndex] = (0, react_1.useState)(null);
+    const timeoutRef = react_1.default.useRef(null);
+    const handleItemMouseEnter = (index) => {
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+            timeoutRef.current = null;
+        }
+        setActiveSubmenuIndex(index);
+    };
+    const handleItemMouseLeave = () => {
+        timeoutRef.current = setTimeout(() => {
+            setActiveSubmenuIndex(null);
+        }, 300);
+    };
+    return ((0, jsx_runtime_1.jsx)("div", { className: "context-menu", style: { top: y, left: x }, onMouseLeave: handleItemMouseLeave, onMouseEnter: () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+                timeoutRef.current = null;
+            }
+        }, children: items.map((item, index) => ((0, jsx_runtime_1.jsx)(ContextMenuItem, { item: item, isActive: activeSubmenuIndex === index, onMouseEnter: () => handleItemMouseEnter(index), onMouseLeave: handleItemMouseLeave }, index))) }));
 };
-const ContextMenuItem = ({ item }) => {
-    const [showSubmenu, setShowSubmenu] = (0, react_1.useState)(false);
+const ContextMenuItem = ({ item, isActive, onMouseEnter, onMouseLeave }) => {
     return ((0, jsx_runtime_1.jsxs)("div", { className: `context-menu-item ${item.danger ? 'danger' : ''}`, onClick: () => {
             if (item.onClick) {
                 item.onClick();
             }
-        }, onMouseEnter: () => setShowSubmenu(true), onMouseLeave: () => setShowSubmenu(false), children: [(0, jsx_runtime_1.jsxs)("div", { className: "menu-item-content", children: [item.color && ((0, jsx_runtime_1.jsx)("span", { className: "color-preview", style: { backgroundColor: item.color } })), (0, jsx_runtime_1.jsx)("span", { children: item.label })] }), item.submenu && (0, jsx_runtime_1.jsx)("span", { className: "submenu-arrow", children: "\u203A" }), item.submenu && showSubmenu && ((0, jsx_runtime_1.jsx)("div", { className: "context-submenu", children: item.submenu.map((subItem, index) => ((0, jsx_runtime_1.jsx)(ContextMenuItem, { item: subItem }, index))) }))] }));
+        }, onMouseEnter: onMouseEnter, children: [(0, jsx_runtime_1.jsxs)("div", { className: "menu-item-content", children: [item.color && ((0, jsx_runtime_1.jsx)("span", { className: "color-preview", style: { backgroundColor: item.color } })), (0, jsx_runtime_1.jsx)("span", { children: item.label })] }), item.submenu && (0, jsx_runtime_1.jsx)("span", { className: "submenu-arrow", children: "\u203A" }), item.submenu && isActive && ((0, jsx_runtime_1.jsx)("div", { className: "context-submenu", children: item.submenu.map((subItem, index) => ((0, jsx_runtime_1.jsx)(ContextMenuItem, { item: subItem, isActive: false, onMouseEnter: () => { }, onMouseLeave: () => { } }, index))) }))] }));
 };
 exports["default"] = ContextMenu;
 

@@ -3,7 +3,7 @@ import { FileTracker } from './FileTracker';
 import { MetroViewPanel } from './MetroViewPanel';
 
 export function activate(context: vscode.ExtensionContext) {
-    console.log('Metro View is now active!');
+
 
     const fileTracker = new FileTracker();
 

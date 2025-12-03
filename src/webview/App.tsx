@@ -68,6 +68,7 @@ const App = () => {
     const [showColorPicker, setShowColorPicker] = useState(false);
     const { project, fitView, setViewport, getViewport, getNodes, getEdges, setCenter, screenToFlowPosition } = useReactFlow();
     const [shadowNodes, setShadowNodes] = useState<Node[]>([]);
+    const [showInactiveStations, setShowInactiveStations] = useState((window as any).initialConfig?.showInactiveStations ?? true);
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -108,7 +109,8 @@ const App = () => {
                 position: n.position,
                 label: n.data.label,
                 status: n.data.status,
-                color: n.data.color // Save color
+                color: n.data.color, // Save color
+                mark: n.data.mark // Save mark
             })),
             groups: [],
             edges: currentEdges.map(e => ({
@@ -198,8 +200,13 @@ const App = () => {
     const renameNode = useCallback(() => {
         if (menu && menu.nodeId) {
             const node = nodes.find(n => n.id === menu.nodeId);
-            if (node) {
-                // Simple prompt for now
+            if (node && node.data.filePath) {
+                vscode.postMessage({
+                    command: 'renameNode',
+                    id: node.id,
+                    oldPath: node.data.filePath
+                });
+                setMenu(null);
             }
         }
     }, [menu, nodes]);
@@ -267,7 +274,7 @@ const App = () => {
         const handleMessage = (event: MessageEvent) => {
             const message = event.data;
             if (message.command === 'updateLayout') {
-                console.log('Received updateLayout message');
+
                 isRestoring.current = true;
                 const layout: MetroLayout = message.layout;
                 // Convert MetroLayout to ReactFlow nodes/edges
@@ -280,6 +287,7 @@ const App = () => {
                         filePath: n.filePath,
                         status: n.status,
                         color: n.color, // Restore color
+                        mark: n.mark, // Restore mark
                         isConnectionMode: false
                     },
                 }));
@@ -338,7 +346,7 @@ const App = () => {
         setNodes((nds) => {
             const cleanNodes = nds.filter(n => !n.id.startsWith('ghost-'));
             if (cleanNodes.length !== nds.length) {
-                console.log('Purged ghost nodes from state');
+
                 return cleanNodes;
             }
             return nds;
@@ -494,9 +502,9 @@ const App = () => {
     }, [setNodes, saveLayout]);
 
     const onNodeDoubleClick = useCallback((event: React.MouseEvent, node: Node) => {
-        console.log('Double clicked node:', node);
+
         if (node.data.filePath) {
-            console.log('Sending openFile command for:', node.data.filePath);
+
             vscode.postMessage({ command: 'openFile', filePath: node.data.filePath });
         } else {
             console.warn('Node has no filePath:', node);
@@ -821,9 +829,13 @@ const App = () => {
                 snapGrid={[40, 40]}
                 nodeOrigin={[0.5, 0.5]}
                 connectionLineType={ConnectionLineType.Straight}
+                // Zoom Lock Logic
+                zoomOnScroll={!zoomLocked}
+                zoomOnPinch={!zoomLocked}
+                zoomOnDoubleClick={!zoomLocked}
             // Remove fitView prop to prevent auto-fit on init if we have a saved viewport
             >
-                <Controls>
+                <Controls showInteractive={false}>
                     <ControlButton onClick={() => setZoomLocked(!zoomLocked)} title={zoomLocked ? "Unlock Zoom" : "Lock Zoom"}>
                         {zoomLocked ? (
                             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -849,10 +861,10 @@ const App = () => {
                         return '#fff';
                     }}
                     nodeBorderRadius={50}
-                    maskColor="rgba(0, 0, 0, 0.6)"
+                    maskColor="var(--vscode-editor-background)"
                     style={{
-                        backgroundColor: '#1e1e1e',
-                        border: '1px solid #333',
+                        backgroundColor: 'var(--vscode-editor-background)',
+                        border: '1px solid var(--vscode-widget-border)',
                         borderRadius: '8px',
                         height: 150,
                         width: 200
@@ -861,14 +873,16 @@ const App = () => {
                     pannable
                     onClick={onMiniMapClick}
                 />
-                <Background
-                    variant={BackgroundVariant.Dots}
-                    gap={40}
-                    size={10}
-                    color="#333"
-                />
+                {showInactiveStations && (
+                    <Background
+                        variant={BackgroundVariant.Dots}
+                        gap={40}
+                        size={6}
+                        color="var(--vscode-scrollbarSlider-background)"
+                    />
+                )}
                 <Panel position="top-right" style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                    <div style={{ color: '#aaa', fontSize: '12px', background: 'rgba(0,0,0,0.5)', padding: '5px 10px', borderRadius: '4px', pointerEvents: 'none' }}>
+                    <div style={{ color: 'var(--vscode-descriptionForeground)', fontSize: '12px', background: 'var(--vscode-editor-background)', padding: '5px 10px', borderRadius: '4px', pointerEvents: 'none', border: '1px solid var(--vscode-widget-border)' }}>
                         Hold <b>Option/Alt</b> to Connect
                     </div>
                     <button
@@ -882,9 +896,9 @@ const App = () => {
                             }
                         }}
                         style={{
-                            background: '#252526',
-                            color: '#cccccc',
-                            border: '1px solid #454545',
+                            background: 'var(--vscode-button-secondaryBackground)',
+                            color: 'var(--vscode-button-secondaryForeground)',
+                            border: '1px solid var(--vscode-button-border)',
                             borderRadius: '4px',
                             padding: '5px 10px',
                             cursor: 'pointer',
