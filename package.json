@@ -1,7 +1,12 @@
 {
-  "name": "metro-view",
-  "displayName": "Metro View",
-  "description": "A whiteboard-style file explorer for VS Code",
+  "name": "file-metro",
+  "displayName": "File Metro",
+  "description": "High-speed file processing with a metro map interface. Visualize your workspace as a connected network.",
+  "publisher": "llingshu",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/file-metro"
+  },
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.80.0"

@@ -938,9 +938,19 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.MetroViewPanel = void 0;
 const vscode = __importStar(__webpack_require__(/*! vscode */ "vscode"));
+const fs = __importStar(__webpack_require__(/*! fs */ "fs"));
 class MetroViewPanel {
     static createOrShow(extensionUri, fileTracker) {
         const column = vscode.window.activeTextEditor
@@ -990,9 +1000,22 @@ class MetroViewPanel {
         this._panel.webview.postMessage({ command: 'updateLayout', layout });
     }
     openFile(filePath) {
-        const openPath = vscode.Uri.file(filePath);
-        vscode.workspace.openTextDocument(openPath).then(doc => {
-            vscode.window.showTextDocument(doc);
+        return __awaiter(this, void 0, void 0, function* () {
+            vscode.window.showInformationMessage(`Attempting to open: ${filePath}`);
+            try {
+                // Check if file exists first
+                if (!fs.existsSync(filePath)) {
+                    vscode.window.showErrorMessage(`File not found: ${filePath}`);
+                    return;
+                }
+                const openPath = vscode.Uri.file(filePath);
+                const doc = yield vscode.workspace.openTextDocument(openPath);
+                yield vscode.window.showTextDocument(doc);
+            }
+            catch (error) {
+                console.error('Failed to open file:', error);
+                vscode.window.showErrorMessage(`Failed to open file: ${error instanceof Error ? error.message : String(error)}`);
+            }
         });
     }
     dispose() {

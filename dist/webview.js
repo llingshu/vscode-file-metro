@@ -792,7 +792,38 @@ body.is-connecting .station-handle.center.source::after {
         opacity: 1;
         transform: scale(1);
     }
-}`, "",{"version":3,"sources":["webpack://./src/webview/index.css"],"names":[],"mappings":"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","sourceRoot":""}]);
+}
+
+/* Station Marks */
+.station-mark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.station-mark.mark-default {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    /* Background color is set inline to match station color */
+}
+
+.station-mark.mark-check {
+    color: #4caf50;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.station-mark.mark-star {
+    color: #ffc107;
+    font-size: 14px;
+}`, "",{"version":3,"sources":["webpack://./src/webview/index.css"],"names":[],"mappings":"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","sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -33063,6 +33094,72 @@ const App = () => {
         };
         vscode.postMessage({ command: 'saveLayout', layout });
     }, [isLoaded, zoomLocked, getViewport, getNodes, getEdges]);
+    (0, react_1.useEffect)(() => {
+        vscode.postMessage({ command: 'webviewReady' });
+    }, []);
+    const onContextMenu = (0, react_1.useCallback)((event) => {
+        var _a;
+        event.preventDefault();
+        const pane = (_a = reactFlowWrapper.current) === null || _a === void 0 ? void 0 : _a.getBoundingClientRect();
+        if (pane) {
+            const flowPosition = project({
+                x: event.clientX - pane.left,
+                y: event.clientY - pane.top,
+            });
+            // Snap to grid
+            flowPosition.x = Math.round(flowPosition.x / 40) * 40;
+            flowPosition.y = Math.round(flowPosition.y / 40) * 40;
+            setMenu({
+                x: event.clientX,
+                y: event.clientY,
+                flowPosition
+            });
+        }
+    }, [project]);
+    const onNodeContextMenu = (0, react_1.useCallback)((event, node) => {
+        event.preventDefault();
+        event.stopPropagation(); // Prevent pane context menu
+        setMenu({
+            x: event.clientX,
+            y: event.clientY,
+            flowPosition: node.position, // Not used for node menu but keeps type happy
+            nodeId: node.id
+        });
+    }, []);
+    const onPaneClick = (0, react_1.useCallback)(() => setMenu(null), []);
+    const createNote = (0, react_1.useCallback)(() => {
+        if (menu && !menu.nodeId) {
+            vscode.postMessage({ command: 'createNote', position: menu.flowPosition });
+            setMenu(null);
+        }
+    }, [menu]);
+    const changeNodeColor = (0, react_1.useCallback)((color) => {
+        if (menu && menu.nodeId) {
+            setNodes((nds) => nds.map(n => {
+                if (n.id === menu.nodeId) {
+                    return Object.assign(Object.assign({}, n), { data: Object.assign(Object.assign({}, n.data), { color }) });
+                }
+                return n;
+            }));
+            // Update outgoing edges to match new color
+            setEdges((eds) => eds.map(e => {
+                if (e.source === menu.nodeId) {
+                    return Object.assign(Object.assign({}, e), { style: Object.assign(Object.assign({}, e.style), { stroke: color }) });
+                }
+                return e;
+            }));
+            setMenu(null);
+            setTimeout(() => saveLayout(), 0);
+        }
+    }, [menu, setNodes, setEdges, saveLayout]);
+    const renameNode = (0, react_1.useCallback)(() => {
+        if (menu && menu.nodeId) {
+            const node = nodes.find(n => n.id === menu.nodeId);
+            if (node) {
+                // Simple prompt for now
+            }
+        }
+    }, [menu, nodes]);
     const onNodesChange = (0, react_1.useCallback)((changes) => {
         // Intercept position changes to enforce snapping on Real Nodes
         const snappedChanges = changes.map(change => {
@@ -33287,101 +33384,33 @@ const App = () => {
         }
     }, [setNodes, saveLayout, screenToFlowPosition]);
     const onNodeClick = (0, react_1.useCallback)((event, node) => {
-        // Single click selects the node (handled by ReactFlow default), no file open
-    }, []);
-    const onNodeDoubleClick = (0, react_1.useCallback)((event, node) => {
-        if (node.data.filePath) {
-            vscode.postMessage({ command: 'openFile', filePath: node.data.filePath });
-        }
-    }, []);
-    // Restore viewport on load
-    (0, react_1.useEffect)(() => {
-        if (isLoaded && nodes.length > 0) {
-            // We need to wait for nodes to be rendered? 
-            // Actually, we should restore viewport from the layout message
-        }
-    }, [isLoaded]);
-    (0, react_1.useEffect)(() => {
-        vscode.postMessage({ command: 'webviewReady' });
-    }, []);
-    const onContextMenu = (0, react_1.useCallback)((event) => {
-        var _a;
-        event.preventDefault();
-        const pane = (_a = reactFlowWrapper.current) === null || _a === void 0 ? void 0 : _a.getBoundingClientRect();
-        if (pane) {
-            const flowPosition = project({
-                x: event.clientX - pane.left,
-                y: event.clientY - pane.top,
-            });
-            // Snap to grid
-            flowPosition.x = Math.round(flowPosition.x / 40) * 40;
-            flowPosition.y = Math.round(flowPosition.y / 40) * 40;
-            setMenu({
-                x: event.clientX,
-                y: event.clientY,
-                flowPosition
-            });
-        }
-    }, [project]);
-    const onNodeContextMenu = (0, react_1.useCallback)((event, node) => {
-        event.preventDefault();
-        event.stopPropagation(); // Prevent pane context menu
-        setMenu({
-            x: event.clientX,
-            y: event.clientY,
-            flowPosition: node.position, // Not used for node menu but keeps type happy
-            nodeId: node.id
-        });
-    }, []);
-    const onPaneClick = (0, react_1.useCallback)(() => setMenu(null), []);
-    const createNote = (0, react_1.useCallback)(() => {
-        if (menu && !menu.nodeId) {
-            vscode.postMessage({ command: 'createNote', position: menu.flowPosition });
-            setMenu(null);
-        }
-    }, [menu]);
-    const changeNodeColor = (0, react_1.useCallback)((color) => {
-        if (menu && menu.nodeId) {
+        // Handle Ctrl/Cmd + Click for Default Mark
+        if (event.ctrlKey || event.metaKey) {
             setNodes((nds) => nds.map(n => {
-                if (n.id === menu.nodeId) {
-                    return Object.assign(Object.assign({}, n), { data: Object.assign(Object.assign({}, n.data), { color }) });
+                if (n.id === node.id) {
+                    const currentMark = n.data.mark;
+                    const newMark = currentMark === 'default' ? 'none' : 'default';
+                    return Object.assign(Object.assign({}, n), { data: Object.assign(Object.assign({}, n.data), { mark: newMark }) });
                 }
                 return n;
             }));
-            // Update outgoing edges to match new color
-            setEdges((eds) => eds.map(e => {
-                if (e.source === menu.nodeId) {
-                    return Object.assign(Object.assign({}, e), { style: Object.assign(Object.assign({}, e.style), { stroke: color }) });
-                }
-                return e;
-            }));
-            setMenu(null);
             setTimeout(() => saveLayout(), 0);
         }
-    }, [menu, setNodes, setEdges, saveLayout]);
-    const renameNode = (0, react_1.useCallback)(() => {
-        if (menu && menu.nodeId) {
-            const node = nodes.find(n => n.id === menu.nodeId);
-            if (node) {
-                // Simple prompt for now, could be a custom UI
-                // Since we can't use window.prompt in VSCode webview easily without blocking, 
-                // we'll just use a quick hack or assume we can't do it nicely yet.
-                // Actually, let's just use the VS Code API if possible or a custom input in the menu.
-                // For this step, I'll add an input field to the menu.
-            }
+    }, [setNodes, saveLayout]);
+    const onNodeDoubleClick = (0, react_1.useCallback)((event, node) => {
+        console.log('Double clicked node:', node);
+        if (node.data.filePath) {
+            console.log('Sending openFile command for:', node.data.filePath);
+            vscode.postMessage({ command: 'openFile', filePath: node.data.filePath });
         }
-    }, [menu, nodes]);
+        else {
+            console.warn('Node has no filePath:', node);
+        }
+    }, []);
     const onNodeDragStart = (0, react_1.useCallback)((event, node) => {
-        // 1. Make the Real Node (snapped) look like a ghost
-        setNodes((nds) => nds.map(n => {
-            if (n.id === node.id) {
-                return Object.assign(Object.assign({}, n), { data: Object.assign(Object.assign({}, n.data), { isGhost: true }) });
-            }
-            return n;
-        }));
-        // 2. Create a Solid Ghost Node that follows the mouse
-        setShadowNodes([Object.assign(Object.assign({}, node), { id: `ghost-${node.id}`, data: Object.assign(Object.assign({}, node.data), { label: '', isGhost: false }), zIndex: 100, selected: true, draggable: false, selectable: false, type: 'station' })]);
-    }, [setNodes]);
+        // Do nothing on start to allow clicks to pass through
+        // Ghost creation is deferred to first drag move
+    }, []);
     const onNodeDrag = (0, react_1.useCallback)((event, node) => {
         var _a;
         const pane = (_a = reactFlowWrapper.current) === null || _a === void 0 ? void 0 : _a.getBoundingClientRect();
@@ -33390,45 +33419,179 @@ const App = () => {
                 x: event.clientX - pane.left,
                 y: event.clientY - pane.top
             });
-            setShadowNodes(prev => prev.map(g => (Object.assign(Object.assign({}, g), { position: flowPos }))));
-        }
-    }, [project]);
-    const onNodeDragStop = (0, react_1.useCallback)((event, node) => {
-        setShadowNodes([]);
-        // Restore Real Node opacity
-        setNodes((nds) => nds.map(n => {
-            if (n.id === node.id) {
-                return Object.assign(Object.assign({}, n), { data: Object.assign(Object.assign({}, n.data), { isGhost: false }) });
+            // Initialize ghost if not already dragging
+            if (shadowNodes.length === 0) {
+                // 1. Make the Real Node (snapped) look like a ghost
+                setNodes((nds) => nds.map(n => {
+                    if (n.id === node.id) {
+                        return Object.assign(Object.assign({}, n), { data: Object.assign(Object.assign({}, n.data), { isGhost: true }) });
+                    }
+                    return n;
+                }));
+                // 2. Create a Solid Ghost Node that follows the mouse
+                setShadowNodes([Object.assign(Object.assign({}, node), { id: `ghost-${node.id}`, data: Object.assign(Object.assign({}, node.data), { label: '', isGhost: false }), zIndex: 100, selected: true, draggable: false, selectable: false, type: 'station', position: flowPos // Set initial position
+                     })]);
             }
-            return n;
-        }));
-        // Save layout after drag is complete
-        setTimeout(() => saveLayout(), 0);
-    }, [setNodes, saveLayout]);
+            else {
+                // Update existing ghost position
+                setShadowNodes(prev => prev.map(g => (Object.assign(Object.assign({}, g), { position: flowPos }))));
+            }
+        }
+    }, [project, shadowNodes, setNodes]);
+    const onNodeDragStop = (0, react_1.useCallback)((event, node) => {
+        // Only save if we actually dragged (shadow nodes exist)
+        if (shadowNodes.length > 0) {
+            setShadowNodes([]);
+            // Restore Real Node opacity
+            setNodes((nds) => nds.map(n => {
+                if (n.id === node.id) {
+                    return Object.assign(Object.assign({}, n), { data: Object.assign(Object.assign({}, n.data), { isGhost: false }) });
+                }
+                return n;
+            }));
+            // Save layout after drag is complete
+            setTimeout(() => saveLayout(), 0);
+        }
+    }, [setNodes, saveLayout, shadowNodes]);
     // Merge nodes with shadow nodes for rendering
     // Shadows should be behind
     const displayNodes = [...shadowNodes, ...(dragGhost ? [dragGhost] : []), ...nodes];
     const deleteNode = (0, react_1.useCallback)(() => {
-        if (menu && menu.nodeId) {
+        // Check if we are deleting a selection
+        const selectedNodes = nodes.filter(n => n.selected);
+        // If menu.nodeId is present, we might be deleting a specific node OR the selection containing it
+        // If menu.nodeId is NOT present (pane click), we only delete if there is a selection
+        let nodesToDelete = [];
+        if (menu === null || menu === void 0 ? void 0 : menu.nodeId) {
+            nodesToDelete = selectedNodes.length > 1 && selectedNodes.find(n => n.id === menu.nodeId)
+                ? selectedNodes
+                : nodes.filter(n => n.id === menu.nodeId);
+        }
+        else if (selectedNodes.length > 0) {
+            nodesToDelete = selectedNodes;
+        }
+        if (nodesToDelete.length > 0) {
+            const idsToDelete = new Set(nodesToDelete.map(n => n.id));
             setNodes((nds) => {
-                const updated = nds.filter(n => n.id !== menu.nodeId);
+                const updated = nds.filter(n => !idsToDelete.has(n.id));
                 setTimeout(() => saveLayout(), 0);
                 return updated;
             });
             // Also remove connected edges
-            setEdges((eds) => eds.filter(e => e.source !== menu.nodeId && e.target !== menu.nodeId));
+            setEdges((eds) => eds.filter(e => !idsToDelete.has(e.source) && !idsToDelete.has(e.target)));
             setMenu(null);
         }
-    }, [menu, setNodes, setEdges, saveLayout]);
+    }, [menu, nodes, setNodes, setEdges, saveLayout]);
+    const batchColor = (0, react_1.useCallback)((color) => {
+        const selectedNodes = nodes.filter(n => n.selected);
+        if (selectedNodes.length > 0) {
+            setNodes((nds) => nds.map(n => {
+                if (n.selected) {
+                    return Object.assign(Object.assign({}, n), { data: Object.assign(Object.assign({}, n.data), { color }) });
+                }
+                return n;
+            }));
+            // Update outgoing edges for all selected nodes
+            const selectedIds = new Set(selectedNodes.map(n => n.id));
+            setEdges((eds) => eds.map(e => {
+                if (selectedIds.has(e.source)) {
+                    return Object.assign(Object.assign({}, e), { style: Object.assign(Object.assign({}, e.style), { stroke: color }) });
+                }
+                return e;
+            }));
+            setTimeout(() => saveLayout(), 0);
+        }
+        setMenu(null);
+    }, [nodes, setNodes, setEdges, saveLayout]);
+    const batchMark = (0, react_1.useCallback)((mark) => {
+        const selectedNodes = nodes.filter(n => n.selected);
+        if (selectedNodes.length > 0) {
+            setNodes((nds) => nds.map(n => {
+                if (n.selected) {
+                    return Object.assign(Object.assign({}, n), { data: Object.assign(Object.assign({}, n.data), { mark }) });
+                }
+                return n;
+            }));
+            setTimeout(() => saveLayout(), 0);
+        }
+        setMenu(null);
+    }, [nodes, setNodes, saveLayout]);
     // Menu Items Configuration
     const getMenuItems = () => {
         if (!menu)
             return [];
         if (menu.nodeId) {
+            const selectedNodes = nodes.filter(n => n.selected);
+            const isBatch = selectedNodes.length > 1 && selectedNodes.some(n => n.id === menu.nodeId);
+            if (isBatch) {
+                return [
+                    {
+                        label: `Batch Color (${selectedNodes.length})`,
+                        submenu: [
+                            ...METRO_COLORS.map(color => ({
+                                label: color,
+                                color: color,
+                                onClick: () => batchColor(color)
+                            })),
+                            {
+                                label: 'Custom Color...',
+                                onClick: () => setShowColorPicker(true) // Note: This will only apply to single node currently unless updated
+                            }
+                        ]
+                    },
+                    {
+                        label: `Batch Mark (${selectedNodes.length})`,
+                        submenu: [
+                            { label: 'None', onClick: () => batchMark('none') },
+                            { label: 'Default (Circle)', onClick: () => batchMark('default') },
+                            { label: 'Check (✓)', onClick: () => batchMark('check') },
+                            { label: 'Star (★)', onClick: () => batchMark('star') }
+                        ]
+                    },
+                    {
+                        label: `Delete ${selectedNodes.length} Stations`,
+                        danger: true,
+                        onClick: deleteNode
+                    }
+                ];
+            }
             return [
                 {
                     label: 'Rename',
                     onClick: renameNode
+                },
+                {
+                    label: 'Mark',
+                    submenu: [
+                        {
+                            label: 'None', onClick: () => {
+                                setNodes(nds => nds.map(n => n.id === menu.nodeId ? Object.assign(Object.assign({}, n), { data: Object.assign(Object.assign({}, n.data), { mark: 'none' }) }) : n));
+                                setMenu(null);
+                                saveLayout();
+                            }
+                        },
+                        {
+                            label: 'Default (Circle)', onClick: () => {
+                                setNodes(nds => nds.map(n => n.id === menu.nodeId ? Object.assign(Object.assign({}, n), { data: Object.assign(Object.assign({}, n.data), { mark: 'default' }) }) : n));
+                                setMenu(null);
+                                saveLayout();
+                            }
+                        },
+                        {
+                            label: 'Check (✓)', onClick: () => {
+                                setNodes(nds => nds.map(n => n.id === menu.nodeId ? Object.assign(Object.assign({}, n), { data: Object.assign(Object.assign({}, n.data), { mark: 'check' }) }) : n));
+                                setMenu(null);
+                                saveLayout();
+                            }
+                        },
+                        {
+                            label: 'Star (★)', onClick: () => {
+                                setNodes(nds => nds.map(n => n.id === menu.nodeId ? Object.assign(Object.assign({}, n), { data: Object.assign(Object.assign({}, n.data), { mark: 'star' }) }) : n));
+                                setMenu(null);
+                                saveLayout();
+                            }
+                        }
+                    ]
                 },
                 {
                     label: 'Change Color',
@@ -33452,6 +33615,43 @@ const App = () => {
             ];
         }
         else {
+            const selectedNodes = nodes.filter(n => n.selected);
+            if (selectedNodes.length > 0) {
+                return [
+                    {
+                        label: `Batch Color (${selectedNodes.length})`,
+                        submenu: [
+                            ...METRO_COLORS.map(color => ({
+                                label: color,
+                                color: color,
+                                onClick: () => batchColor(color)
+                            })),
+                            {
+                                label: 'Custom Color...',
+                                onClick: () => setShowColorPicker(true)
+                            }
+                        ]
+                    },
+                    {
+                        label: `Batch Mark (${selectedNodes.length})`,
+                        submenu: [
+                            { label: 'None', onClick: () => batchMark('none') },
+                            { label: 'Default (Circle)', onClick: () => batchMark('default') },
+                            { label: 'Check (✓)', onClick: () => batchMark('check') },
+                            { label: 'Star (★)', onClick: () => batchMark('star') }
+                        ]
+                    },
+                    {
+                        label: `Delete ${selectedNodes.length} Stations`,
+                        danger: true,
+                        onClick: deleteNode
+                    },
+                    {
+                        label: 'Create Note',
+                        onClick: createNote
+                    }
+                ];
+            }
             return [
                 {
                     label: 'Create Note',
@@ -33540,7 +33740,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const jsx_runtime_1 = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
 const react_1 = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 const ContextMenu = ({ x, y, items, onClose }) => {
-    return ((0, jsx_runtime_1.jsx)("div", { className: "context-menu", style: { top: y, left: x }, onMouseLeave: onClose, children: items.map((item, index) => ((0, jsx_runtime_1.jsx)(ContextMenuItem, { item: item }, index))) }));
+    return ((0, jsx_runtime_1.jsx)("div", { className: "context-menu", style: { top: y, left: x }, children: items.map((item, index) => ((0, jsx_runtime_1.jsx)(ContextMenuItem, { item: item }, index))) }));
 };
 const ContextMenuItem = ({ item }) => {
     const [showSubmenu, setShowSubmenu] = (0, react_1.useState)(false);
@@ -33572,7 +33772,7 @@ const StationNode = ({ data, selected }) => {
         borderColor: data.color,
         boxShadow: `0 0 0 2px ${data.color}33` // Subtle glow with same color
     } : {};
-    return ((0, jsx_runtime_1.jsxs)("div", { className: `station-node ${selected ? 'selected' : ''} ${data.status === 'missing' ? 'missing' : ''} ${data.isConnectionMode ? 'connection-target' : ''} ${data.isGhost ? 'ghost' : ''}`, style: style, children: [(0, jsx_runtime_1.jsx)(reactflow_1.Handle, { type: "target", position: reactflow_1.Position.Top, className: "station-handle center target" }), (0, jsx_runtime_1.jsx)(reactflow_1.Handle, { type: "source", position: reactflow_1.Position.Top, className: "station-handle center source" }), (0, jsx_runtime_1.jsx)("div", { className: "station-label", children: data.label })] }));
+    return ((0, jsx_runtime_1.jsxs)("div", { className: `station-node ${selected ? 'selected' : ''} ${data.status === 'missing' ? 'missing' : ''} ${data.isConnectionMode ? 'connection-target' : ''} ${data.isGhost ? 'ghost' : ''}`, style: style, children: [(0, jsx_runtime_1.jsx)(reactflow_1.Handle, { type: "target", position: reactflow_1.Position.Top, className: "station-handle center target" }), (0, jsx_runtime_1.jsx)(reactflow_1.Handle, { type: "source", position: reactflow_1.Position.Top, className: "station-handle center source" }), (0, jsx_runtime_1.jsx)("div", { className: "station-label", children: data.label }), data.mark && data.mark !== 'none' && ((0, jsx_runtime_1.jsxs)("div", { className: `station-mark mark-${data.mark}`, style: { backgroundColor: data.mark === 'default' ? data.color : undefined }, children: [data.mark === 'check' && '✓', data.mark === 'star' && '★'] }))] }));
 };
 exports["default"] = (0, react_1.memo)(StationNode);
 

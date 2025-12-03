@@ -27,6 +27,16 @@ const StationNode = ({ data, selected }: NodeProps) => {
 
 
             <div className="station-label">{data.label}</div>
+
+            {data.mark && data.mark !== 'none' && (
+                <div
+                    className={`station-mark mark-${data.mark}`}
+                    style={{ backgroundColor: data.mark === 'default' ? data.color : undefined }}
+                >
+                    {data.mark === 'check' && '✓'}
+                    {data.mark === 'star' && '★'}
+                </div>
+            )}
         </div>
     );
 };

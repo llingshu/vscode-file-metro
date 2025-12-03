@@ -20,7 +20,6 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ x, y, items, onClose }) => {
         <div
             className="context-menu"
             style={{ top: y, left: x }}
-            onMouseLeave={onClose}
         >
             {items.map((item, index) => (
                 <ContextMenuItem key={index} item={item} />

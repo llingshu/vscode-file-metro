@@ -337,3 +337,34 @@ body.is-connecting .station-handle.center.source::after {
         transform: scale(1);
     }
 }
+
+/* Station Marks */
+.station-mark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.station-mark.mark-default {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    /* Background color is set inline to match station color */
+}
+
+.station-mark.mark-check {
+    color: #4caf50;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.station-mark.mark-star {
+    color: #ffc107;
+    font-size: 14px;
+}

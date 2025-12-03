@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as fs from 'fs';
 import { FileTracker } from './FileTracker';
 import { MetroLayout } from './types';
 
@@ -75,11 +76,22 @@ export class MetroViewPanel {
         this._panel.webview.postMessage({ command: 'updateLayout', layout });
     }
 
-    private openFile(filePath: string) {
-        const openPath = vscode.Uri.file(filePath);
-        vscode.workspace.openTextDocument(openPath).then(doc => {
-            vscode.window.showTextDocument(doc);
-        });
+    private async openFile(filePath: string) {
+        vscode.window.showInformationMessage(`Attempting to open: ${filePath}`);
+        try {
+            // Check if file exists first
+            if (!fs.existsSync(filePath)) {
+                vscode.window.showErrorMessage(`File not found: ${filePath}`);
+                return;
+            }
+
+            const openPath = vscode.Uri.file(filePath);
+            const doc = await vscode.workspace.openTextDocument(openPath);
+            await vscode.window.showTextDocument(doc);
+        } catch (error) {
+            console.error('Failed to open file:', error);
+            vscode.window.showErrorMessage(`Failed to open file: ${error instanceof Error ? error.message : String(error)}`);
+        }
     }
 
     public dispose() {

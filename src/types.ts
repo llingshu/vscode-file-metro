@@ -7,6 +7,7 @@ export interface MetroNode {
     parentId?: string; // For groups
     status?: 'active' | 'missing';
     color?: string; // Custom color
+    mark?: 'none' | 'default' | 'check' | 'star';
 }
 
 export interface MetroGroup {

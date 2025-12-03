@@ -122,6 +122,88 @@ const App = () => {
         vscode.postMessage({ command: 'saveLayout', layout });
     }, [isLoaded, zoomLocked, getViewport, getNodes, getEdges]);
 
+    useEffect(() => {
+        vscode.postMessage({ command: 'webviewReady' });
+    }, []);
+
+    const onContextMenu = useCallback(
+        (event: React.MouseEvent) => {
+            event.preventDefault();
+            const pane = reactFlowWrapper.current?.getBoundingClientRect();
+            if (pane) {
+                const flowPosition = project({
+                    x: event.clientX - pane.left,
+                    y: event.clientY - pane.top,
+                });
+                // Snap to grid
+                flowPosition.x = Math.round(flowPosition.x / 40) * 40;
+                flowPosition.y = Math.round(flowPosition.y / 40) * 40;
+
+                setMenu({
+                    x: event.clientX,
+                    y: event.clientY,
+                    flowPosition
+                });
+            }
+        },
+        [project]
+    );
+
+    const onNodeContextMenu = useCallback(
+        (event: React.MouseEvent, node: Node) => {
+            event.preventDefault();
+            event.stopPropagation(); // Prevent pane context menu
+
+            setMenu({
+                x: event.clientX,
+                y: event.clientY,
+                flowPosition: node.position, // Not used for node menu but keeps type happy
+                nodeId: node.id
+            });
+        },
+        []
+    );
+
+    const onPaneClick = useCallback(() => setMenu(null), []);
+
+    const createNote = useCallback(() => {
+        if (menu && !menu.nodeId) {
+            vscode.postMessage({ command: 'createNote', position: menu.flowPosition });
+            setMenu(null);
+        }
+    }, [menu]);
+
+    const changeNodeColor = useCallback((color: string) => {
+        if (menu && menu.nodeId) {
+            setNodes((nds) => nds.map(n => {
+                if (n.id === menu.nodeId) {
+                    return { ...n, data: { ...n.data, color } };
+                }
+                return n;
+            }));
+
+            // Update outgoing edges to match new color
+            setEdges((eds) => eds.map(e => {
+                if (e.source === menu.nodeId) {
+                    return { ...e, style: { ...e.style, stroke: color } };
+                }
+                return e;
+            }));
+
+            setMenu(null);
+            setTimeout(() => saveLayout(), 0);
+        }
+    }, [menu, setNodes, setEdges, saveLayout]);
+
+    const renameNode = useCallback(() => {
+        if (menu && menu.nodeId) {
+            const node = nodes.find(n => n.id === menu.nodeId);
+            if (node) {
+                // Simple prompt for now
+            }
+        }
+    }, [menu, nodes]);
+
     const onNodesChange = useCallback(
         (changes: NodeChange[]) => {
             // Intercept position changes to enforce snapping on Real Nodes
@@ -397,132 +479,34 @@ const App = () => {
     );
 
     const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
-        // Single click selects the node (handled by ReactFlow default), no file open
-    }, []);
-
-    const onNodeDoubleClick = useCallback((event: React.MouseEvent, node: Node) => {
-        if (node.data.filePath) {
-            vscode.postMessage({ command: 'openFile', filePath: node.data.filePath });
-        }
-    }, []);
-
-    // Restore viewport on load
-    useEffect(() => {
-        if (isLoaded && nodes.length > 0) {
-            // We need to wait for nodes to be rendered? 
-            // Actually, we should restore viewport from the layout message
-        }
-    }, [isLoaded]);
-
-    useEffect(() => {
-        vscode.postMessage({ command: 'webviewReady' });
-    }, []);
-
-    const onContextMenu = useCallback(
-        (event: React.MouseEvent) => {
-            event.preventDefault();
-            const pane = reactFlowWrapper.current?.getBoundingClientRect();
-            if (pane) {
-                const flowPosition = project({
-                    x: event.clientX - pane.left,
-                    y: event.clientY - pane.top,
-                });
-                // Snap to grid
-                flowPosition.x = Math.round(flowPosition.x / 40) * 40;
-                flowPosition.y = Math.round(flowPosition.y / 40) * 40;
-
-                setMenu({
-                    x: event.clientX,
-                    y: event.clientY,
-                    flowPosition
-                });
-            }
-        },
-        [project]
-    );
-
-    const onNodeContextMenu = useCallback(
-        (event: React.MouseEvent, node: Node) => {
-            event.preventDefault();
-            event.stopPropagation(); // Prevent pane context menu
-
-            setMenu({
-                x: event.clientX,
-                y: event.clientY,
-                flowPosition: node.position, // Not used for node menu but keeps type happy
-                nodeId: node.id
-            });
-        },
-        []
-    );
-
-    const onPaneClick = useCallback(() => setMenu(null), []);
-
-    const createNote = useCallback(() => {
-        if (menu && !menu.nodeId) {
-            vscode.postMessage({ command: 'createNote', position: menu.flowPosition });
-            setMenu(null);
-        }
-    }, [menu]);
-
-    const changeNodeColor = useCallback((color: string) => {
-        if (menu && menu.nodeId) {
+        // Handle Ctrl/Cmd + Click for Default Mark
+        if (event.ctrlKey || event.metaKey) {
             setNodes((nds) => nds.map(n => {
-                if (n.id === menu.nodeId) {
-                    return { ...n, data: { ...n.data, color } };
+                if (n.id === node.id) {
+                    const currentMark = n.data.mark;
+                    const newMark = currentMark === 'default' ? 'none' : 'default';
+                    return { ...n, data: { ...n.data, mark: newMark } };
                 }
                 return n;
             }));
-
-            // Update outgoing edges to match new color
-            setEdges((eds) => eds.map(e => {
-                if (e.source === menu.nodeId) {
-                    return { ...e, style: { ...e.style, stroke: color } };
-                }
-                return e;
-            }));
-
-            setMenu(null);
             setTimeout(() => saveLayout(), 0);
         }
-    }, [menu, setNodes, setEdges, saveLayout]);
+    }, [setNodes, saveLayout]);
 
-    const renameNode = useCallback(() => {
-        if (menu && menu.nodeId) {
-            const node = nodes.find(n => n.id === menu.nodeId);
-            if (node) {
-                // Simple prompt for now, could be a custom UI
-                // Since we can't use window.prompt in VSCode webview easily without blocking, 
-                // we'll just use a quick hack or assume we can't do it nicely yet.
-                // Actually, let's just use the VS Code API if possible or a custom input in the menu.
-                // For this step, I'll add an input field to the menu.
-            }
+    const onNodeDoubleClick = useCallback((event: React.MouseEvent, node: Node) => {
+        console.log('Double clicked node:', node);
+        if (node.data.filePath) {
+            console.log('Sending openFile command for:', node.data.filePath);
+            vscode.postMessage({ command: 'openFile', filePath: node.data.filePath });
+        } else {
+            console.warn('Node has no filePath:', node);
         }
-    }, [menu, nodes]);
-
-
+    }, []);
 
     const onNodeDragStart = useCallback((event: React.MouseEvent, node: Node) => {
-        // 1. Make the Real Node (snapped) look like a ghost
-        setNodes((nds) => nds.map(n => {
-            if (n.id === node.id) {
-                return { ...n, data: { ...n.data, isGhost: true } };
-            }
-            return n;
-        }));
-
-        // 2. Create a Solid Ghost Node that follows the mouse
-        setShadowNodes([{
-            ...node,
-            id: `ghost-${node.id}`,
-            data: { ...node.data, label: '', isGhost: false }, // Solid
-            zIndex: 100, // On top
-            selected: true, // Look selected
-            draggable: false,
-            selectable: false,
-            type: 'station'
-        }]);
-    }, [setNodes]);
+        // Do nothing on start to allow clicks to pass through
+        // Ghost creation is deferred to first drag move
+    }, []);
 
     const onNodeDrag = useCallback((event: React.MouseEvent, node: Node) => {
         const pane = reactFlowWrapper.current?.getBoundingClientRect();
@@ -532,54 +516,201 @@ const App = () => {
                 y: event.clientY - pane.top
             });
 
-            setShadowNodes(prev => prev.map(g => ({
-                ...g,
-                position: flowPos
-            })));
+            // Initialize ghost if not already dragging
+            if (shadowNodes.length === 0) {
+                // 1. Make the Real Node (snapped) look like a ghost
+                setNodes((nds) => nds.map(n => {
+                    if (n.id === node.id) {
+                        return { ...n, data: { ...n.data, isGhost: true } };
+                    }
+                    return n;
+                }));
+
+                // 2. Create a Solid Ghost Node that follows the mouse
+                setShadowNodes([{
+                    ...node,
+                    id: `ghost-${node.id}`,
+                    data: { ...node.data, label: '', isGhost: false }, // Solid
+                    zIndex: 100, // On top
+                    selected: true, // Look selected
+                    draggable: false,
+                    selectable: false,
+                    type: 'station',
+                    position: flowPos // Set initial position
+                }]);
+            } else {
+                // Update existing ghost position
+                setShadowNodes(prev => prev.map(g => ({
+                    ...g,
+                    position: flowPos
+                })));
+            }
         }
-    }, [project]);
+    }, [project, shadowNodes, setNodes]);
 
     const onNodeDragStop = useCallback((event: React.MouseEvent, node: Node) => {
-        setShadowNodes([]);
+        // Only save if we actually dragged (shadow nodes exist)
+        if (shadowNodes.length > 0) {
+            setShadowNodes([]);
 
-        // Restore Real Node opacity
-        setNodes((nds) => nds.map(n => {
-            if (n.id === node.id) {
-                return { ...n, data: { ...n.data, isGhost: false } };
-            }
-            return n;
-        }));
+            // Restore Real Node opacity
+            setNodes((nds) => nds.map(n => {
+                if (n.id === node.id) {
+                    return { ...n, data: { ...n.data, isGhost: false } };
+                }
+                return n;
+            }));
 
-        // Save layout after drag is complete
-        setTimeout(() => saveLayout(), 0);
-    }, [setNodes, saveLayout]);
+            // Save layout after drag is complete
+            setTimeout(() => saveLayout(), 0);
+        }
+    }, [setNodes, saveLayout, shadowNodes]);
 
     // Merge nodes with shadow nodes for rendering
     // Shadows should be behind
     const displayNodes = [...shadowNodes, ...(dragGhost ? [dragGhost] : []), ...nodes];
 
     const deleteNode = useCallback(() => {
-        if (menu && menu.nodeId) {
+        // Check if we are deleting a selection
+        const selectedNodes = nodes.filter(n => n.selected);
+
+        // If menu.nodeId is present, we might be deleting a specific node OR the selection containing it
+        // If menu.nodeId is NOT present (pane click), we only delete if there is a selection
+
+        let nodesToDelete: Node[] = [];
+
+        if (menu?.nodeId) {
+            nodesToDelete = selectedNodes.length > 1 && selectedNodes.find(n => n.id === menu.nodeId)
+                ? selectedNodes
+                : nodes.filter(n => n.id === menu.nodeId);
+        } else if (selectedNodes.length > 0) {
+            nodesToDelete = selectedNodes;
+        }
+
+        if (nodesToDelete.length > 0) {
+            const idsToDelete = new Set(nodesToDelete.map(n => n.id));
+
             setNodes((nds) => {
-                const updated = nds.filter(n => n.id !== menu.nodeId);
+                const updated = nds.filter(n => !idsToDelete.has(n.id));
                 setTimeout(() => saveLayout(), 0);
                 return updated;
             });
             // Also remove connected edges
-            setEdges((eds) => eds.filter(e => e.source !== menu.nodeId && e.target !== menu.nodeId));
+            setEdges((eds) => eds.filter(e => !idsToDelete.has(e.source) && !idsToDelete.has(e.target)));
             setMenu(null);
         }
-    }, [menu, setNodes, setEdges, saveLayout]);
+    }, [menu, nodes, setNodes, setEdges, saveLayout]);
+
+    const batchColor = useCallback((color: string) => {
+        const selectedNodes = nodes.filter(n => n.selected);
+        if (selectedNodes.length > 0) {
+            setNodes((nds) => nds.map(n => {
+                if (n.selected) {
+                    return { ...n, data: { ...n.data, color } };
+                }
+                return n;
+            }));
+            // Update outgoing edges for all selected nodes
+            const selectedIds = new Set(selectedNodes.map(n => n.id));
+            setEdges((eds) => eds.map(e => {
+                if (selectedIds.has(e.source)) {
+                    return { ...e, style: { ...e.style, stroke: color } };
+                }
+                return e;
+            }));
+            setTimeout(() => saveLayout(), 0);
+        }
+        setMenu(null);
+    }, [nodes, setNodes, setEdges, saveLayout]);
+
+    const batchMark = useCallback((mark: 'none' | 'default' | 'check' | 'star') => {
+        const selectedNodes = nodes.filter(n => n.selected);
+        if (selectedNodes.length > 0) {
+            setNodes((nds) => nds.map(n => {
+                if (n.selected) {
+                    return { ...n, data: { ...n.data, mark } };
+                }
+                return n;
+            }));
+            setTimeout(() => saveLayout(), 0);
+        }
+        setMenu(null);
+    }, [nodes, setNodes, saveLayout]);
 
     // Menu Items Configuration
     const getMenuItems = (): MenuItem[] => {
         if (!menu) return [];
 
         if (menu.nodeId) {
+            const selectedNodes = nodes.filter(n => n.selected);
+            const isBatch = selectedNodes.length > 1 && selectedNodes.some(n => n.id === menu.nodeId);
+
+            if (isBatch) {
+                return [
+                    {
+                        label: `Batch Color (${selectedNodes.length})`,
+                        submenu: [
+                            ...METRO_COLORS.map(color => ({
+                                label: color,
+                                color: color,
+                                onClick: () => batchColor(color)
+                            })),
+                            {
+                                label: 'Custom Color...',
+                                onClick: () => setShowColorPicker(true) // Note: This will only apply to single node currently unless updated
+                            }
+                        ]
+                    },
+                    {
+                        label: `Batch Mark (${selectedNodes.length})`,
+                        submenu: [
+                            { label: 'None', onClick: () => batchMark('none') },
+                            { label: 'Default (Circle)', onClick: () => batchMark('default') },
+                            { label: 'Check (✓)', onClick: () => batchMark('check') },
+                            { label: 'Star (★)', onClick: () => batchMark('star') }
+                        ]
+                    },
+                    {
+                        label: `Delete ${selectedNodes.length} Stations`,
+                        danger: true,
+                        onClick: deleteNode
+                    }
+                ];
+            }
+
             return [
                 {
                     label: 'Rename',
                     onClick: renameNode
+                },
+                {
+                    label: 'Mark',
+                    submenu: [
+                        {
+                            label: 'None', onClick: () => {
+                                setNodes(nds => nds.map(n => n.id === menu.nodeId ? { ...n, data: { ...n.data, mark: 'none' } } : n));
+                                setMenu(null); saveLayout();
+                            }
+                        },
+                        {
+                            label: 'Default (Circle)', onClick: () => {
+                                setNodes(nds => nds.map(n => n.id === menu.nodeId ? { ...n, data: { ...n.data, mark: 'default' } } : n));
+                                setMenu(null); saveLayout();
+                            }
+                        },
+                        {
+                            label: 'Check (✓)', onClick: () => {
+                                setNodes(nds => nds.map(n => n.id === menu.nodeId ? { ...n, data: { ...n.data, mark: 'check' } } : n));
+                                setMenu(null); saveLayout();
+                            }
+                        },
+                        {
+                            label: 'Star (★)', onClick: () => {
+                                setNodes(nds => nds.map(n => n.id === menu.nodeId ? { ...n, data: { ...n.data, mark: 'star' } } : n));
+                                setMenu(null); saveLayout();
+                            }
+                        }
+                    ]
                 },
                 {
                     label: 'Change Color',
@@ -602,6 +733,44 @@ const App = () => {
                 }
             ];
         } else {
+            const selectedNodes = nodes.filter(n => n.selected);
+            if (selectedNodes.length > 0) {
+                return [
+                    {
+                        label: `Batch Color (${selectedNodes.length})`,
+                        submenu: [
+                            ...METRO_COLORS.map(color => ({
+                                label: color,
+                                color: color,
+                                onClick: () => batchColor(color)
+                            })),
+                            {
+                                label: 'Custom Color...',
+                                onClick: () => setShowColorPicker(true)
+                            }
+                        ]
+                    },
+                    {
+                        label: `Batch Mark (${selectedNodes.length})`,
+                        submenu: [
+                            { label: 'None', onClick: () => batchMark('none') },
+                            { label: 'Default (Circle)', onClick: () => batchMark('default') },
+                            { label: 'Check (✓)', onClick: () => batchMark('check') },
+                            { label: 'Star (★)', onClick: () => batchMark('star') }
+                        ]
+                    },
+                    {
+                        label: `Delete ${selectedNodes.length} Stations`,
+                        danger: true,
+                        onClick: deleteNode
+                    },
+                    {
+                        label: 'Create Note',
+                        onClick: createNote
+                    }
+                ];
+            }
+
             return [
                 {
                     label: 'Create Note',
