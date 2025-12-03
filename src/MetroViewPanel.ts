@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
+import * as path from 'path';
 import { FileTracker } from './FileTracker';
 import { MetroLayout } from './types';
 
@@ -50,17 +51,26 @@ export class MetroViewPanel {
             message => {
                 switch (message.command) {
                     case 'saveLayout':
-                        console.log('Received saveLayout message from webview');
+
                         this._fileTracker.saveLayout(message.layout);
                         return;
                     case 'openFile':
-                        this.openFile(message.filePath);
+                        vscode.commands.executeCommand('vscode.open', vscode.Uri.file(message.filePath));
                         return;
                     case 'createNote':
-                        const newNode = this._fileTracker.createNote(message.position);
-                        if (newNode) {
-                            this.updateLayout(this._fileTracker.getLayout());
-                        }
+                        this._fileTracker.createNote(message.position);
+                        this.updateLayout(this._fileTracker.getLayout());
+                        return;
+                    case 'renameNode':
+                        vscode.window.showInputBox({
+                            prompt: 'Enter new name',
+                            value: path.basename(message.oldPath)
+                        }).then(newName => {
+                            if (newName) {
+                                this._fileTracker.renameFile(message.id, message.oldPath, newName);
+                                this.updateLayout(this._fileTracker.getLayout());
+                            }
+                        });
                         return;
                     case 'webviewReady':
                         this.updateLayout(this._fileTracker.getLayout());
@@ -113,6 +123,7 @@ export class MetroViewPanel {
     private _getHtmlForWebview(webview: vscode.Webview) {
         const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'dist', 'webview.js'));
         const nonce = getNonce();
+        const config = vscode.workspace.getConfiguration('metro');
 
         return `<!DOCTYPE html>
             <html lang="en">
@@ -123,6 +134,11 @@ export class MetroViewPanel {
                 <style>
                     body { padding: 0; margin: 0; width: 100%; height: 100vh; overflow: hidden; }
                 </style>
+                <script nonce="${nonce}">
+                    window.initialConfig = {
+                        showInactiveStations: ${config.get('showInactiveStations', true)}
+                    };
+                </script>
             </head>
             <body>
                 <div id="root" style="width: 100%; height: 100%;"></div>

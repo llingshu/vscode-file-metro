@@ -20,7 +20,7 @@ export class FileTracker {
                 fs.mkdirSync(vscodeDir);
             }
             this.layoutFilePath = path.join(vscodeDir, 'metro-layout.json');
-            console.log('FileTracker initialized. Layout path:', this.layoutFilePath);
+
             this.loadLayout();
         }
     }
@@ -69,7 +69,7 @@ export class FileTracker {
     public saveLayout(layout: MetroLayout) {
         this.currentLayout = layout;
         if (this.layoutFilePath) {
-            console.log('Saving layout to:', this.layoutFilePath);
+
             fs.writeFileSync(this.layoutFilePath, JSON.stringify(layout, null, 2));
         }
     }
@@ -123,5 +123,24 @@ export class FileTracker {
             this.saveLayout(this.currentLayout);
         }
         return changed;
+    }
+
+    public renameFile(nodeId: string, oldPath: string, newName: string) {
+        const dir = path.dirname(oldPath);
+        const newPath = path.join(dir, newName);
+
+        try {
+            fs.renameSync(oldPath, newPath);
+
+            // Update node in layout
+            const node = this.currentLayout.nodes.find(n => n.id === nodeId);
+            if (node) {
+                node.filePath = newPath;
+                node.label = newName;
+                this.saveLayout(this.currentLayout);
+            }
+        } catch (error) {
+            vscode.window.showErrorMessage(`Failed to rename file: ${error}`);
+        }
     }
 }

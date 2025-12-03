@@ -1,76 +1,64 @@
 body {
     margin: 0;
     padding: 0;
-    background-color: #1e1e1e;
-    /* Dark mode default */
-    color: white;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background-color: var(--vscode-editor-background);
+    color: var(--vscode-editor-foreground);
+    font-family: var(--vscode-font-family);
 }
 
 /* React Flow Customization */
 /* Station Node */
-/* Station Node */
 .station-node {
-    background: #ffffff;
+    background: var(--vscode-editor-background);
     border: 4px solid #007fd4;
-    /* Thicker border */
+    /* Keep blue border for identity */
     border-radius: 50%;
     width: 20px;
-    /* Slightly larger */
     height: 20px;
     position: relative;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    /* Stronger shadow */
     transition: all 0.2s ease;
     box-sizing: border-box;
     z-index: 10;
     cursor: move;
-    /* Default move cursor */
 }
 
 .station-node.missing {
-    border-color: #666;
-    background: #ccc;
+    border-color: var(--vscode-disabledForeground);
+    background: var(--vscode-editor-inactiveSelectionBackground);
 }
 
 .station-node.selected {
-    /* border-color: #ffffff; Removed to prevent "all white" look */
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
-    /* Subtle glow instead */
+    box-shadow: 0 0 0 2px var(--vscode-focusBorder);
 }
 
 .station-node.ghost {
     opacity: 0.4;
     border-style: solid;
-    /* Solid but transparent looks better than broken dashed */
-    background: rgba(255, 255, 255, 0.5);
+    background: var(--vscode-editor-background);
     pointer-events: none;
     z-index: 1;
-    /* Behind everything */
 }
 
 .station-label {
     position: absolute;
     top: 24px;
-    /* 20px height + 4px gap */
     left: 50%;
     transform: translateX(-50%);
     font-size: 11px;
-    color: #cccccc;
+    color: var(--vscode-editor-foreground);
     white-space: nowrap;
-    background: rgba(30, 30, 30, 0.8);
+    background: var(--vscode-editor-widget-background);
     padding: 1px 4px;
     border-radius: 3px;
     pointer-events: none;
     z-index: 10;
-    /* Ensure label is above other elements */
+    border: 1px solid var(--vscode-widget-border);
 }
 
 .station-handle {
     opacity: 0;
-    /* Hide handles but keep them functional */
     pointer-events: none !important;
-    /* Disable connections by default */
 }
 
 .station-handle.center {
@@ -104,13 +92,11 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 20px;
-    /* Full node size */
     height: 20px;
     border-radius: 50%;
     background: transparent;
     cursor: crosshair;
     pointer-events: none;
-    /* Default: Pass through to node for dragging */
 }
 
 /* Target Handle: Large Outer Ring (End Drag) */
@@ -121,12 +107,10 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 32px;
-    /* Large catch area */
     height: 32px;
     border-radius: 50%;
     background: transparent;
     pointer-events: none;
-    /* Default: Pass through to node for dragging */
 }
 
 /* Enable Source Handle when Alt is held (Connection Mode) */
@@ -146,7 +130,6 @@ body.is-connecting .station-handle.center.source,
 body.is-connecting .station-handle.center.source::after {
     pointer-events: none !important;
     display: none !important;
-    /* Ensure it's gone */
 }
 
 .connection-mode .station-node {
@@ -155,13 +138,11 @@ body.is-connecting .station-handle.center.source::after {
 
 .connection-mode .station-handle {
     pointer-events: auto !important;
-    /* Enable connections when Alt is pressed */
     cursor: crosshair;
 }
 
 .react-flow__edge-path {
     stroke-width: 4px;
-    /* Thick metro line */
     stroke-linecap: round;
 }
 
@@ -169,21 +150,21 @@ body.is-connecting .station-handle.center.source::after {
 .context-menu {
     position: fixed;
     z-index: 1000;
-    background: rgba(30, 30, 30, 0.95);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
+    background: var(--vscode-menu-background);
+    border: 1px solid var(--vscode-menu-border);
+    border-radius: 4px;
     padding: 4px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     min-width: 180px;
     animation: fadeIn 0.1s ease-out;
+    color: var(--vscode-menu-foreground);
 }
 
 .context-menu-item {
     padding: 8px 12px;
     cursor: pointer;
     font-size: 13px;
-    color: #e0e0e0;
+    color: var(--vscode-menu-foreground);
     border-radius: 4px;
     display: flex;
     justify-content: space-between;
@@ -193,15 +174,17 @@ body.is-connecting .station-handle.center.source::after {
 }
 
 .context-menu-item:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: var(--vscode-menu-selectionBackground);
+    color: var(--vscode-menu-selectionForeground);
 }
 
 .context-menu-item.danger {
-    color: #ff4d4d;
+    color: var(--vscode-errorForeground);
 }
 
 .context-menu-item.danger:hover {
-    background-color: rgba(255, 77, 77, 0.1);
+    background-color: var(--vscode-button-secondaryHoverBackground);
+    /* Just a guess, or keep custom red */
 }
 
 .menu-item-content {
@@ -214,12 +197,13 @@ body.is-connecting .station-handle.center.source::after {
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid var(--vscode-widget-border);
 }
 
 .submenu-arrow {
     font-size: 10px;
-    color: #888;
+    color: var(--vscode-menu-foreground);
+    opacity: 0.7;
 }
 
 /* Submenu */
@@ -228,10 +212,9 @@ body.is-connecting .station-handle.center.source::after {
     top: 0;
     left: 100%;
     margin-left: 4px;
-    background: rgba(30, 30, 30, 0.95);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
+    background: var(--vscode-menu-background);
+    border: 1px solid var(--vscode-menu-border);
+    border-radius: 4px;
     padding: 4px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     min-width: 150px;
@@ -254,18 +237,19 @@ body.is-connecting .station-handle.center.source::after {
 }
 
 .modal-content {
-    background: #252526;
-    border: 1px solid #454545;
+    background: var(--vscode-editor-widget-background);
+    border: 1px solid var(--vscode-widget-border);
     border-radius: 8px;
     padding: 20px;
     width: 300px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    color: var(--vscode-editor-foreground);
 }
 
 .modal-content h3 {
     margin: 0 0 16px 0;
     font-size: 16px;
-    color: #fff;
+    color: var(--vscode-editor-foreground);
 }
 
 .color-picker-container {
@@ -285,9 +269,9 @@ body.is-connecting .station-handle.center.source::after {
 
 .hex-input {
     flex: 1;
-    background: #333;
-    border: 1px solid #555;
-    color: #fff;
+    background: var(--vscode-input-background);
+    border: 1px solid var(--vscode-input-border);
+    color: var(--vscode-input-foreground);
     padding: 0 8px;
     border-radius: 4px;
     font-family: monospace;
@@ -308,22 +292,22 @@ body.is-connecting .station-handle.center.source::after {
 }
 
 .modal-btn.cancel {
-    background: transparent;
-    color: #ccc;
-    border: 1px solid #555;
+    background: var(--vscode-button-secondaryBackground);
+    color: var(--vscode-button-secondaryForeground);
+    border: 1px solid var(--vscode-button-border);
 }
 
 .modal-btn.cancel:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--vscode-button-secondaryHoverBackground);
 }
 
 .modal-btn.apply {
-    background: #007fd4;
-    color: white;
+    background: var(--vscode-button-background);
+    color: var(--vscode-button-foreground);
 }
 
 .modal-btn.apply:hover {
-    background: #0060a0;
+    background: var(--vscode-button-hoverBackground);
 }
 
 @keyframes fadeIn {
@@ -352,19 +336,22 @@ body.is-connecting .station-handle.center.source::after {
 }
 
 .station-mark.mark-default {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.2);
     /* Background color is set inline to match station color */
+    background-color: #007fd4;
+    /* Fallback */
 }
 
 .station-mark.mark-check {
-    color: #4caf50;
+    color: var(--vscode-testing-iconPassed);
     font-size: 14px;
     font-weight: bold;
 }
 
 .station-mark.mark-star {
-    color: #ffc107;
+    color: var(--vscode-editorWarning-foreground);
     font-size: 14px;
 }

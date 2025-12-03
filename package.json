@@ -1,15 +1,17 @@
 {
   "name": "file-metro",
   "displayName": "File Metro",
-  "description": "High-speed file processing with a metro map interface. Visualize your workspace as a connected network.",
+  "description": "Visualize your workspace as a metro map",
   "publisher": "llingshu",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/file-metro"
+    "url": "https://github.com/llingshu/vscode-file-metro"
   },
-  "version": "0.0.1",
+  "version": "0.0.3",
+  "icon": "images/icon.png",
+  "license": "MIT",
   "engines": {
-    "vscode": "^1.80.0"
+    "vscode": "^1.106.0"
   },
   "categories": [
     "Other"
@@ -22,7 +24,22 @@
         "command": "metro.open",
         "title": "Open Metro View"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "File Metro Configuration",
+      "properties": {
+        "metro.defaultColor": {
+          "type": "string",
+          "default": "#007fd4",
+          "description": "Default color for new stations"
+        },
+        "metro.showInactiveStations": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show inactive stations (background dots)"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
