@@ -8,6 +8,9 @@ export class FileTracker {
     private layoutFilePath: string | undefined;
     private currentLayout: MetroLayout = { nodes: [], groups: [], edges: [] };
 
+    private _onDidLayoutChange = new vscode.EventEmitter<MetroLayout>();
+    public readonly onDidLayoutChange = this._onDidLayoutChange.event;
+
     constructor() {
         this.initialize();
     }
@@ -77,9 +80,9 @@ export class FileTracker {
 
         this.currentLayout = layout;
         if (this.layoutFilePath) {
-
             fs.writeFileSync(this.layoutFilePath, JSON.stringify(layout, null, 2));
         }
+        this._onDidLayoutChange.fire(this.currentLayout);
     }
 
     public getLayout(): MetroLayout {

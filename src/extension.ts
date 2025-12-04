@@ -14,6 +14,12 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
+        fileTracker.onDidLayoutChange(() => {
+            localProvider.updateLayout();
+        })
+    );
+
+    context.subscriptions.push(
         vscode.commands.registerCommand('metro.open', () => {
             MetroViewPanel.createOrShow(context.extensionUri, fileTracker);
         })

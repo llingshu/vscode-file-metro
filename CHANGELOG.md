@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.1]
+### Fixed
+- **Local View Update**: Fixed issue where Local Metro View would not update automatically when creating new notes or routes.
+
 ## [0.1.0]
 ### Added
 - **Local Metro View**: New sidebar view that automatically centers on the active file.
