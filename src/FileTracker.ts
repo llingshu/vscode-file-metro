@@ -67,6 +67,14 @@ export class FileTracker {
     }
 
     public saveLayout(layout: MetroLayout) {
+        // Preserve viewport and zoomLocked if not provided (e.g. from Local View)
+        if (!layout.viewport && this.currentLayout.viewport) {
+            layout.viewport = this.currentLayout.viewport;
+        }
+        if (layout.zoomLocked === undefined && this.currentLayout.zoomLocked !== undefined) {
+            layout.zoomLocked = this.currentLayout.zoomLocked;
+        }
+
         this.currentLayout = layout;
         if (this.layoutFilePath) {
 

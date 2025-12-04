@@ -69,6 +69,7 @@ const App = () => {
     const { project, fitView, setViewport, getViewport, getNodes, getEdges, setCenter, screenToFlowPosition } = useReactFlow();
     const [shadowNodes, setShadowNodes] = useState<Node[]>([]);
     const [showInactiveStations, setShowInactiveStations] = useState((window as any).initialConfig?.showInactiveStations ?? true);
+    const isLocal = (window as any).initialConfig?.isLocal ?? false;
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -118,7 +119,7 @@ const App = () => {
                 source: e.source,
                 target: e.target
             })),
-            viewport: currentViewport,
+            viewport: isLocal ? undefined : currentViewport,
             zoomLocked: zoomLocked
         };
         vscode.postMessage({ command: 'saveLayout', layout });
@@ -273,6 +274,14 @@ const App = () => {
     useEffect(() => {
         const handleMessage = (event: MessageEvent) => {
             const message = event.data;
+            if (message.command === 'focusNode') {
+                const nodeId = message.nodeId;
+                const node = getNodes().find(n => n.id === nodeId);
+                if (node) {
+                    setCenter(node.position.x, node.position.y, { zoom: 1, duration: 800 });
+                }
+            }
+
             if (message.command === 'updateLayout') {
 
                 isRestoring.current = true;
@@ -354,10 +363,10 @@ const App = () => {
     }, [setNodes]);
 
     const onMoveEnd = useCallback((event: any, viewport: any) => {
-        if (event) {
+        if (event && !isLocal) {
             saveLayout();
         }
-    }, [saveLayout]);
+    }, [saveLayout, isLocal]);
 
     const [dragGhost, setDragGhost] = useState<Node | null>(null);
 
@@ -833,81 +842,88 @@ const App = () => {
                 zoomOnScroll={!zoomLocked}
                 zoomOnPinch={!zoomLocked}
                 zoomOnDoubleClick={!zoomLocked}
-            // Remove fitView prop to prevent auto-fit on init if we have a saved viewport
+                fitView={!isLoaded && !isLocal}
+                proOptions={{ hideAttribution: true }}
             >
-                <Controls showInteractive={false}>
-                    <ControlButton onClick={() => setZoomLocked(!zoomLocked)} title={zoomLocked ? "Unlock Zoom" : "Lock Zoom"}>
-                        {zoomLocked ? (
-                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                            </svg>
-                        ) : (
-                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                                <path d="M7 11V7a5 5 0 0 1 9.9-1"></path>
-                            </svg>
-                        )}
-                    </ControlButton>
-                </Controls>
-                <MiniMap
-                    nodeColor={(n) => {
-                        if (n.type === 'station') return n.data.color || '#007fd4';
-                        return '#eee';
-                    }}
-                    nodeStrokeWidth={3}
-                    nodeStrokeColor={(n) => {
-                        if (n.type === 'station') return n.data.color || '#007fd4';
-                        return '#fff';
-                    }}
-                    nodeBorderRadius={50}
-                    maskColor="var(--vscode-editor-background)"
-                    style={{
-                        backgroundColor: 'var(--vscode-editor-background)',
-                        border: '1px solid var(--vscode-widget-border)',
-                        borderRadius: '8px',
-                        height: 150,
-                        width: 200
-                    }}
-                    zoomable
-                    pannable
-                    onClick={onMiniMapClick}
-                />
+                {!isLocal && (
+                    <Controls showInteractive={false}>
+                        <ControlButton onClick={() => setZoomLocked(!zoomLocked)} title={zoomLocked ? "Unlock Zoom" : "Lock Zoom"}>
+                            {zoomLocked ? (
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                            ) : (
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 9.9-1"></path>
+                                </svg>
+                            )}
+                        </ControlButton>
+                    </Controls>
+                )}
+                {!isLocal && (
+                    <MiniMap
+                        nodeColor={(n) => {
+                            if (n.type === 'station') return n.data.color || '#007fd4';
+                            return '#eee';
+                        }}
+                        nodeStrokeWidth={3}
+                        nodeStrokeColor={(n) => {
+                            if (n.type === 'station') return n.data.color || '#007fd4';
+                            return '#fff';
+                        }}
+                        nodeBorderRadius={50}
+                        maskColor="var(--vscode-editor-background)"
+                        style={{
+                            backgroundColor: 'var(--vscode-editor-background)',
+                            border: '1px solid var(--vscode-widget-border)',
+                            borderRadius: '8px',
+                            height: 150,
+                            width: 200
+                        }}
+                        zoomable
+                        pannable
+                        onClick={onMiniMapClick}
+                    />
+                )}
                 {showInactiveStations && (
                     <Background
                         variant={BackgroundVariant.Dots}
                         gap={40}
-                        size={6}
+                        size={isLocal ? 8 : 6}
                         color="var(--vscode-scrollbarSlider-background)"
                     />
                 )}
-                <Panel position="top-right" style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                    <div style={{ color: 'var(--vscode-descriptionForeground)', fontSize: '12px', background: 'var(--vscode-editor-background)', padding: '5px 10px', borderRadius: '4px', pointerEvents: 'none', border: '1px solid var(--vscode-widget-border)' }}>
-                        Hold <b>Option/Alt</b> to Connect
-                    </div>
-                    <button
-                        onClick={() => {
-                            if (zoomLocked) {
-                                // If zoom locked, we only center, keeping current zoom
-                                const currentZoom = getViewport().zoom;
-                                fitView({ duration: 800, minZoom: currentZoom, maxZoom: currentZoom });
-                            } else {
-                                fitView({ duration: 800 });
-                            }
-                        }}
-                        style={{
-                            background: 'var(--vscode-button-secondaryBackground)',
-                            color: 'var(--vscode-button-secondaryForeground)',
-                            border: '1px solid var(--vscode-button-border)',
-                            borderRadius: '4px',
-                            padding: '5px 10px',
-                            cursor: 'pointer',
-                            fontSize: '12px'
-                        }}
-                    >
-                        Reset View
-                    </button>
-                </Panel>
+                {!isLocal && (
+                    <Panel position="top-right" style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                        <div style={{ color: 'var(--vscode-descriptionForeground)', fontSize: '12px', background: 'var(--vscode-editor-background)', padding: '5px 10px', borderRadius: '4px', pointerEvents: 'none', border: '1px solid var(--vscode-widget-border)' }}>
+                            Hold <b>Option/Alt</b> to Connect
+                        </div>
+                        <button
+                            onClick={() => {
+                                if (zoomLocked) {
+                                    // If zoom locked, we only center, keeping current zoom
+                                    const currentZoom = getViewport().zoom;
+                                    fitView({ duration: 800, minZoom: currentZoom, maxZoom: currentZoom });
+                                } else {
+                                    fitView({ duration: 800 });
+                                }
+                            }}
+                            style={{
+                                background: 'var(--vscode-button-secondaryBackground)',
+                                color: 'var(--vscode-button-secondaryForeground)',
+                                border: '1px solid var(--vscode-button-border)',
+                                borderRadius: '4px',
+                                padding: '5px 10px',
+                                cursor: 'pointer',
+                                fontSize: '12px'
+                            }}
+                        >
+                            Reset View
+                        </button>
+                    </Panel>
+                )}
                 {menu && (
                     <ContextMenu
                         x={menu.x}

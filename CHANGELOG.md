@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.0]
+### Added
+- **Local Metro View**: New sidebar view that automatically centers on the active file.
+- **Local Interactions**: Enabled dragging and context menus in Local View.
+- **Config**: Added `metro.showInactiveStations` setting.
+
+### Changed
+- **UI**: Removed React Flow attribution for a cleaner look.
+- **Visuals**: Increased size of inactive stations in Local View for better visibility.
+
+## [0.0.4]
+### Fixed
+- **TypeScript Version**: Updated to compatible version.
+
 ## [0.0.3]
 ### Added
 - **Theme Support**: Full support for VS Code Light and Dark themes.

@@ -7,11 +7,11 @@
     "type": "git",
     "url": "https://github.com/llingshu/vscode-file-metro"
   },
-  "version": "0.0.3",
+  "version": "0.1.0",
   "icon": "images/icon.png",
   "license": "MIT",
   "engines": {
-    "vscode": "^1.106.0"
+    "vscode": "^1.100.0"
   },
   "categories": [
     "Other"
@@ -25,6 +25,25 @@
         "title": "Open Metro View"
       }
     ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "metro-activity-bar",
+          "title": "Metro",
+          "icon": "images/icon.png"
+        }
+      ]
+    },
+    "views": {
+      "metro-activity-bar": [
+        {
+          "type": "webview",
+          "id": "metro.localView",
+          "name": "Local Metro View",
+          "icon": "images/icon.png"
+        }
+      ]
+    },
     "configuration": {
       "title": "File Metro Configuration",
       "properties": {
@@ -56,7 +75,7 @@
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@types/uuid": "^10.0.0",
-    "@types/vscode": "^1.106.1",
+    "@types/vscode": "^1.100.0",
     "css-loader": "^7.1.2",
     "style-loader": "^4.0.0",
     "ts-loader": "^9.5.4",

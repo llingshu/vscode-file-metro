@@ -14,6 +14,7 @@ Personally, I found this **spatial, manual approach** to be very comfortable for
 
 ## Features
 
+*   **Local Metro View**: A dedicated sidebar view that syncs with your active file.
 *   **Visual Map**: Drag & drop files to create stations.
 *   **Connections**: Hold `Alt` + Drag between stations to link them.
 *   **Organization**: Color code stations and add status marks (Check, Star).
