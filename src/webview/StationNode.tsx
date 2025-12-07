@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
 
-const StationNode = ({ data, selected }: NodeProps) => {
+const StationNode = ({ id, data, selected }: NodeProps) => {
     const style = data.color ? {
         borderColor: data.color,
         boxShadow: `0 0 0 2px ${data.color}33` // Subtle glow with same color
@@ -11,6 +11,16 @@ const StationNode = ({ data, selected }: NodeProps) => {
         <div
             className={`station-node ${selected ? 'selected' : ''} ${data.status === 'missing' ? 'missing' : ''} ${data.isConnectionMode ? 'connection-target' : ''} ${data.isGhost ? 'ghost' : ''}`}
             style={style}
+            onAuxClick={(e) => {
+                // Middle Click (Button 1)
+                if (e.button === 1) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (data.onRename && data.filePath) {
+                        data.onRename(id, data.filePath);
+                    }
+                }
+            }}
         >
             {/* Center handles for straight lines from middle */}
             <Handle

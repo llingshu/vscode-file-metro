@@ -167,7 +167,24 @@ const App = () => {
         []
     );
 
-    const onPaneClick = useCallback(() => setMenu(null), []);
+    const onPaneClick = useCallback((event: React.MouseEvent) => {
+        // Middle Click (Button 1) to Create Note
+        if (event.button === 1) {
+            event.preventDefault();
+            const position = screenToFlowPosition({
+                x: event.clientX,
+                y: event.clientY
+            });
+
+            // Snap to grid
+            position.x = Math.round(position.x / 40) * 40;
+            position.y = Math.round(position.y / 40) * 40;
+
+            vscode.postMessage({ command: 'createNote', position });
+            return;
+        }
+        setMenu(null);
+    }, [screenToFlowPosition]);
 
     const createNote = useCallback(() => {
         if (menu && !menu.nodeId) {
@@ -297,7 +314,14 @@ const App = () => {
                         status: n.status,
                         color: n.color, // Restore color
                         mark: n.mark, // Restore mark
-                        isConnectionMode: false
+                        isConnectionMode: false,
+                        onRename: (id: string, oldPath: string) => {
+                            vscode.postMessage({
+                                command: 'renameNode',
+                                id,
+                                oldPath
+                            });
+                        }
                     },
                 }));
                 setNodes(newNodes);
@@ -479,7 +503,14 @@ const App = () => {
                             label: filePath.split('/').pop(),
                             filePath,
                             status: 'active',
-                            color: METRO_COLORS[Math.floor(Math.random() * METRO_COLORS.length)]
+                            color: METRO_COLORS[Math.floor(Math.random() * METRO_COLORS.length)],
+                            onRename: (id: string, oldPath: string) => {
+                                vscode.postMessage({
+                                    command: 'renameNode',
+                                    id,
+                                    oldPath
+                                });
+                            }
                         },
                     };
                 });
@@ -814,6 +845,7 @@ const App = () => {
             onDragOver={onDragOver}
             onDragLeave={onDragLeave}
             onDrop={onDrop}
+            onAuxClick={onPaneClick} // Handle middle click here as onPaneClick might be swallowed by ReactFlow
         >
 
             <ReactFlow
@@ -842,6 +874,7 @@ const App = () => {
                 zoomOnScroll={!zoomLocked}
                 zoomOnPinch={!zoomLocked}
                 zoomOnDoubleClick={!zoomLocked}
+                panOnDrag={[0]} // Only left click pans, freeing up middle click
                 fitView={!isLoaded && !isLocal}
                 proOptions={{ hideAttribution: true }}
             >
@@ -874,7 +907,9 @@ const App = () => {
                             return '#fff';
                         }}
                         nodeBorderRadius={50}
-                        maskColor="var(--vscode-editor-background)"
+                        maskColor="color-mix(in srgb, var(--vscode-editor-background), transparent 60%)"
+                        maskStrokeColor="#007fd4"
+                        maskStrokeWidth={4}
                         style={{
                             backgroundColor: 'var(--vscode-editor-background)',
                             border: '1px solid var(--vscode-widget-border)',

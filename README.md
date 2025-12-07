@@ -37,6 +37,8 @@ Personally, I found this **spatial, manual approach** to be very comfortable for
 | **Open File** | Double Click Station |
 | **Pan Canvas** | Drag Background (if unlocked) |
 | **Zoom** | Scroll Wheel (if unlocked) |
+| **Rename Station** | Middle Click Station |
+| **Create Note** | Middle Click Background |
 
 ## Contributing
 

@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.2]
+### Added
+- **Middle-Click Rename**: Middle-click on a station node to rename it.
+- **Middle-Click Create**: Middle-click on the background to create a new note at that position.
+
+### Fixed
+- **MiniMap Visibility**: Fixed issue where off-screen nodes were hidden in the MiniMap.
+- **MiniMap Viewport**: Added a clear border to the MiniMap viewport indicator.
+
 ## [0.1.1]
 ### Fixed
 - **Local View Update**: Fixed issue where Local Metro View would not update automatically when creating new notes or routes.
