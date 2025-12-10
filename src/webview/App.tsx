@@ -35,6 +35,11 @@ declare const acquireVsCodeApi: () => {
 const vscode = acquireVsCodeApi();
 
 import StationNode from './StationNode';
+import StickyNoteNode from './StickyNoteNode';
+import TextNode from './TextNode';
+import ShapeNode from './ShapeNode';
+import GroupNode from './GroupNode';
+import Toolbar, { ToolType } from './Toolbar';
 import ContextMenu, { MenuItem } from './ContextMenu';
 import ColorPickerModal from './ColorPickerModal';
 
@@ -42,6 +47,10 @@ import ColorPickerModal from './ColorPickerModal';
 
 const nodeTypes: NodeTypes = {
     station: StationNode,
+    sticky: StickyNoteNode,
+    text: TextNode,
+    shape: ShapeNode,
+    group: GroupNode
 };
 
 const initialNodes: Node[] = [];
@@ -70,6 +79,7 @@ const App = () => {
     const [shadowNodes, setShadowNodes] = useState<Node[]>([]);
     const [showInactiveStations, setShowInactiveStations] = useState((window as any).initialConfig?.showInactiveStations ?? true);
     const isLocal = (window as any).initialConfig?.isLocal ?? false;
+    const [activeTool, setActiveTool] = useState<ToolType>('select');
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -105,15 +115,20 @@ const App = () => {
         const layout: MetroLayout = {
             nodes: cleanNodes.map(n => ({
                 id: n.id,
-                type: 'file',
+                type: n.type as any, // Save actual type
                 filePath: n.data.filePath,
                 position: n.position,
                 label: n.data.label,
                 status: n.data.status,
-                color: n.data.color, // Save color
-                mark: n.data.mark // Save mark
+                color: n.data.color,
+                mark: n.data.mark,
+                // Whiteboard data
+                content: n.data.content,
+                shapeType: n.data.shapeType,
+                width: n.width || undefined,
+                height: n.height || undefined,
+                style: n.data.style
             })),
-            groups: [],
             edges: currentEdges.map(e => ({
                 id: e.id,
                 source: e.source,
@@ -168,27 +183,98 @@ const App = () => {
     );
 
     const onPaneClick = useCallback((event: React.MouseEvent) => {
-        // Middle Click (Button 1) to Create Note
+        // Middle Click (Button 1) to Create Note (Retained from existing code)
         if (event.button === 1) {
             event.preventDefault();
             const position = screenToFlowPosition({
                 x: event.clientX,
                 y: event.clientY
             });
-
-            // Snap to grid
             position.x = Math.round(position.x / 40) * 40;
             position.y = Math.round(position.y / 40) * 40;
-
             vscode.postMessage({ command: 'createNote', position });
             return;
         }
+
         // Ignore Right Click (Button 2) as it's handled by onContextMenu
         if (event.button === 2) {
             return;
         }
+
+        // Handle Tool Creation
+        if (activeTool !== 'select' && activeTool !== 'hand') {
+            const position = screenToFlowPosition({
+                x: event.clientX,
+                y: event.clientY
+            });
+            // Snap
+            position.x = Math.round(position.x / 40) * 40;
+            position.y = Math.round(position.y / 40) * 40;
+
+            const id = uuidv4();
+            let newNode: Node;
+
+            const commonData = {
+                onContentChange: (id: string, content: string) => {
+                    setNodes(nds => nds.map(n => n.id === id ? { ...n, data: { ...n.data, content } } : n));
+                    // Debounce save if needed, or just rely on next save
+                },
+                onLabelChange: (id: string, label: string) => {
+                    setNodes(nds => nds.map(n => n.id === id ? { ...n, data: { ...n.data, label } } : n));
+                }
+            };
+
+            if (activeTool === 'sticky') {
+                newNode = {
+                    id,
+                    type: 'sticky',
+                    position,
+                    data: { ...commonData, content: '' }
+                };
+            } else if (activeTool === 'text') {
+                newNode = {
+                    id,
+                    type: 'text',
+                    position,
+                    data: { ...commonData, content: 'Text' }
+                };
+            } else if (activeTool === 'shape-rect') {
+                newNode = {
+                    id,
+                    type: 'shape',
+                    position,
+                    data: { ...commonData, shapeType: 'rect', style: { backgroundColor: 'transparent', borderColor: '#ffffff' } },
+                    style: { width: 100, height: 100 }
+                };
+            } else if (activeTool === 'shape-circle') {
+                newNode = {
+                    id,
+                    type: 'shape',
+                    position,
+                    data: { ...commonData, shapeType: 'circle', style: { backgroundColor: 'transparent', borderColor: '#ffffff' } },
+                    style: { width: 100, height: 100 }
+                };
+            } else if (activeTool === 'group') {
+                newNode = {
+                    id,
+                    type: 'group',
+                    position,
+                    data: { ...commonData, label: 'Group' },
+                    style: { width: 200, height: 200 },
+                    zIndex: -1
+                };
+            }
+
+            if (newNode!) {
+                setNodes((nds) => nds.concat(newNode));
+                setActiveTool('select'); // Reset to select after creation
+                setTimeout(() => saveLayout(), 0);
+            }
+            return;
+        }
+
         setMenu(null);
-    }, [screenToFlowPosition]);
+    }, [screenToFlowPosition, activeTool, setNodes, saveLayout]);
 
     const createNote = useCallback(() => {
         if (menu && !menu.nodeId) {
@@ -310,14 +396,20 @@ const App = () => {
                 // Convert MetroLayout to ReactFlow nodes/edges
                 const newNodes: Node[] = layout.nodes.map(n => ({
                     id: n.id,
-                    type: 'station', // Custom type
+                    type: n.type === 'file' ? 'station' : (n.type || 'station'), // Map file to station, others keep type
                     position: n.position,
+                    width: n.width,
+                    height: n.height,
+                    zIndex: n.type === 'group' ? -1 : undefined,
                     data: {
                         label: n.label,
                         filePath: n.filePath,
                         status: n.status,
-                        color: n.color, // Restore color
-                        mark: n.mark, // Restore mark
+                        color: n.color,
+                        mark: n.mark,
+                        content: n.content,
+                        style: n.style,
+                        shapeType: n.shapeType || (n.style?.borderRadius ? 'rect' : 'rect'), // Fallback
                         isConnectionMode: false,
                         onRename: (id: string, oldPath: string) => {
                             vscode.postMessage({
@@ -325,6 +417,12 @@ const App = () => {
                                 id,
                                 oldPath
                             });
+                        },
+                        onContentChange: (id: string, content: string) => {
+                            setNodes(nds => nds.map(n => n.id === id ? { ...n, data: { ...n.data, content } } : n));
+                        },
+                        onLabelChange: (id: string, label: string) => {
+                            setNodes(nds => nds.map(n => n.id === id ? { ...n, data: { ...n.data, label } } : n));
                         }
                     },
                 }));
@@ -933,6 +1031,11 @@ const App = () => {
                         size={isLocal ? 8 : 6}
                         color="var(--vscode-scrollbarSlider-background)"
                     />
+                )}
+                {!isLocal && (
+                    <Panel position="bottom-center">
+                        <Toolbar activeTool={activeTool} onToolChange={setActiveTool} />
+                    </Panel>
                 )}
                 {!isLocal && (
                     <Panel position="top-right" style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
