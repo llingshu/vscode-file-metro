@@ -183,6 +183,10 @@ const App = () => {
             vscode.postMessage({ command: 'createNote', position });
             return;
         }
+        // Ignore Right Click (Button 2) as it's handled by onContextMenu
+        if (event.button === 2) {
+            return;
+        }
         setMenu(null);
     }, [screenToFlowPosition]);
 
@@ -737,25 +741,25 @@ const App = () => {
                         {
                             label: 'None', onClick: () => {
                                 setNodes(nds => nds.map(n => n.id === menu.nodeId ? { ...n, data: { ...n.data, mark: 'none' } } : n));
-                                setMenu(null); saveLayout();
+                                setMenu(null); setTimeout(() => saveLayout(), 0);
                             }
                         },
                         {
                             label: 'Default (Circle)', onClick: () => {
                                 setNodes(nds => nds.map(n => n.id === menu.nodeId ? { ...n, data: { ...n.data, mark: 'default' } } : n));
-                                setMenu(null); saveLayout();
+                                setMenu(null); setTimeout(() => saveLayout(), 0);
                             }
                         },
                         {
                             label: 'Check (✓)', onClick: () => {
                                 setNodes(nds => nds.map(n => n.id === menu.nodeId ? { ...n, data: { ...n.data, mark: 'check' } } : n));
-                                setMenu(null); saveLayout();
+                                setMenu(null); setTimeout(() => saveLayout(), 0);
                             }
                         },
                         {
                             label: 'Star (★)', onClick: () => {
                                 setNodes(nds => nds.map(n => n.id === menu.nodeId ? { ...n, data: { ...n.data, mark: 'star' } } : n));
-                                setMenu(null); saveLayout();
+                                setMenu(null); setTimeout(() => saveLayout(), 0);
                             }
                         }
                     ]
