@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0]
+### Changed
+- **Rebranding**: Renamed extension to **Metro Code Board: Architecture & Whiteboard** to reflect the new vision.
+
 ## [0.1.2]
 ### Added
 - **Middle-Click Rename**: Middle-click on a station node to rename it.

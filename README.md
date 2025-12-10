@@ -1,16 +1,27 @@
-# File Metro
+# Metro Code Board
+(Formerly File Metro)
 
-![File Metro Banner](images/banner.jpg)
+![Metro Code Board Banner](images/banner.jpg)
 
-**File Metro** visualizes your workspace as a metro map. Files are stations, dependencies are lines.
+**Metro Code Board** is an infinite canvas for your code. It visualizes your workspace as a metro map, allowing you to see connections, plan architecture, and think spatially.
 
-## Philosophy
+## Vision: The Infinite Code Canvas
 
-I built File Metro based on a simple belief: **links should be intentional**.
+I built **Metro Code Board** based on a simple belief: **links should be intentional**.
 
-In an era of auto-generated backlinks and knowledge graphs, I found that true understanding comes from *gardening* your connections, not just accumulating them. I wanted a tool that forces me to manually curate the relationships between my notes—to treat my knowledge base as a spatial map rather than a database.
+But as I used it, I realized that a simple map isn't enough. We need a **spatial workspace**—an infinite canvas where code, thoughts, and diagrams live side-by-side.
 
-Personally, I found this **spatial, manual approach** to be very comfortable for coding as well. Visualizing your codebase as a metro map helps you build a mental model of your project's architecture that a file tree simply can't match.
+My goal is to evolve this tool into a **Whiteboard for your Codebase**. It won't just be for navigating files; it will be for *thinking* about them.
+
+## Roadmap
+
+I am actively working on transforming this extension into a full-featured infinite canvas. Here is the plan:
+
+*   [ ] **Whiteboard Tools**: Add text boxes, shapes (rectangles, circles), and sticky notes to the canvas.
+*   [ ] **Groups**: Ability to group nodes together and navigate to them via a sidebar list.
+*   [ ] **Rich Connections**: Add labels and direction arrows to connections to describe relationships (e.g., "imports", "depends on").
+*   [ ] **Multimedia**: Support for images and markdown snippets directly on the canvas.
+*   [ ] **Refactoring**: Rename the project to reflect this new direction (e.g., "Code Canvas" or "Metro Board").
 
 ## Features
 

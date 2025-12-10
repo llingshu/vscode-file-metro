@@ -1,13 +1,13 @@
 {
   "name": "file-metro",
-  "displayName": "File Metro",
-  "description": "Visualize your workspace as a metro map",
+  "displayName": "Metro Code Board: Architecture & Whiteboard",
+  "description": "Infinite canvas for code visualization, architecture diagrams, and whiteboard.",
   "publisher": "llingshu",
   "repository": {
     "type": "git",
     "url": "https://github.com/llingshu/vscode-file-metro"
   },
-  "version": "0.1.2",
+  "version": "0.2.0",
   "icon": "images/icon.png",
   "license": "MIT",
   "engines": {
