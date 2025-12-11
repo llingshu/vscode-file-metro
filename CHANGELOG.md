@@ -6,6 +6,11 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - **Rebranding**: Renamed extension to **Metro Code Board: Architecture & Whiteboard** to reflect the new vision.
 
+## [0.1.3]
+### Fixed
+- **Context Menu**: Fixed issue where context menu would close immediately upon releasing the right mouse button.
+- **Persistence**: Fixed issue where station markers (Check, Star, etc.) were not saving correctly and disappeared on reload.
+
 ## [0.1.2]
 ### Added
 - **Middle-Click Rename**: Middle-click on a station node to rename it.
