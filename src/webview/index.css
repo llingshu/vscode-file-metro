@@ -146,6 +146,10 @@ body.is-connecting .station-handle.center.source::after {
     stroke-linecap: round;
 }
 
+.react-flow__pane {
+    cursor: default !important;
+}
+
 /* Context Menu */
 .context-menu {
     position: fixed;
@@ -354,4 +358,49 @@ body.is-connecting .station-handle.center.source::after {
 .station-mark.mark-star {
     color: var(--vscode-editorWarning-foreground);
     font-size: 14px;
+}
+
+.station-mark.mark-coordinate {
+    width: 30px;
+    height: 30px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 100;
+}
+
+.station-mark.mark-coordinate::before,
+.station-mark.mark-coordinate::after {
+    content: '';
+    position: absolute;
+    background-color: var(--vscode-editor-foreground);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.station-mark.mark-coordinate::before {
+    width: 2px;
+    height: 100%;
+}
+
+.station-mark.mark-coordinate::after {
+    width: 100%;
+    height: 2px;
+}
+
+/* Task Marker: Changes the node shape to a square */
+.station-node.is-task {
+    border-radius: 4px !important;
+}
+
+.station-mark.mark-task {
+    /* Maybe a small icon inside or just let the shape be the mark */
+    display: none;
+}
+
+.station-node.is-task.completed {
+    background-color: var(--vscode-notebookStatusSuccessIcon-foreground) !important;
+    border-color: var(--vscode-notebookStatusSuccessIcon-foreground) !important;
 }

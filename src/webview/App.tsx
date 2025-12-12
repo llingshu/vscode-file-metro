@@ -22,7 +22,8 @@ import ReactFlow, {
     ConnectionLineType
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { MetroNode, MetroLayout } from '../types';
+import { MetroLayout, MetroNode, MetroEdge, MetroGroup } from '../types';
+import { NavigationPanel } from './NavigationPanel';
 import { v4 as uuidv4 } from 'uuid';
 
 // VS Code API
@@ -35,11 +36,6 @@ declare const acquireVsCodeApi: () => {
 const vscode = acquireVsCodeApi();
 
 import StationNode from './StationNode';
-import StickyNoteNode from './StickyNoteNode';
-import TextNode from './TextNode';
-import ShapeNode from './ShapeNode';
-import GroupNode from './GroupNode';
-import Toolbar, { ToolType } from './Toolbar';
 import ContextMenu, { MenuItem } from './ContextMenu';
 import ColorPickerModal from './ColorPickerModal';
 
@@ -47,10 +43,6 @@ import ColorPickerModal from './ColorPickerModal';
 
 const nodeTypes: NodeTypes = {
     station: StationNode,
-    sticky: StickyNoteNode,
-    text: TextNode,
-    shape: ShapeNode,
-    group: GroupNode
 };
 
 const initialNodes: Node[] = [];
@@ -73,13 +65,13 @@ const App = () => {
     const [connectionMode, setConnectionMode] = useState(false);
     const [isLoaded, setIsLoaded] = useState(false);
     const [menu, setMenu] = useState<{ x: number; y: number, flowPosition: { x: number, y: number }, nodeId?: string } | null>(null);
+    const [editingEdge, setEditingEdge] = useState<{ id: string, x: number, y: number, label: string } | null>(null);
     const [zoomLocked, setZoomLocked] = useState(false);
     const [showColorPicker, setShowColorPicker] = useState(false);
     const { project, fitView, setViewport, getViewport, getNodes, getEdges, setCenter, screenToFlowPosition } = useReactFlow();
     const [shadowNodes, setShadowNodes] = useState<Node[]>([]);
     const [showInactiveStations, setShowInactiveStations] = useState((window as any).initialConfig?.showInactiveStations ?? true);
     const isLocal = (window as any).initialConfig?.isLocal ?? false;
-    const [activeTool, setActiveTool] = useState<ToolType>('select');
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -115,24 +107,21 @@ const App = () => {
         const layout: MetroLayout = {
             nodes: cleanNodes.map(n => ({
                 id: n.id,
-                type: n.type as any, // Save actual type
+                type: 'file',
                 filePath: n.data.filePath,
                 position: n.position,
                 label: n.data.label,
                 status: n.data.status,
-                color: n.data.color,
-                mark: n.data.mark,
-                // Whiteboard data
-                content: n.data.content,
-                shapeType: n.data.shapeType,
-                width: n.width || undefined,
-                height: n.height || undefined,
-                style: n.data.style
+                color: n.data.color, // Save color
+                mark: n.data.mark, // Save mark
+                completed: n.data.completed // Save completion status
             })),
+            groups: [],
             edges: currentEdges.map(e => ({
                 id: e.id,
                 source: e.source,
-                target: e.target
+                target: e.target,
+                label: e.label as string | undefined
             })),
             viewport: isLocal ? undefined : currentViewport,
             zoomLocked: zoomLocked
@@ -183,98 +172,28 @@ const App = () => {
     );
 
     const onPaneClick = useCallback((event: React.MouseEvent) => {
-        // Middle Click (Button 1) to Create Note (Retained from existing code)
+        // Ignore Right Click (Button 2) as it is handled by onContextMenu
+        if (event.button === 2) {
+            return;
+        }
+
+        // Middle Click (Button 1) to Create Note
         if (event.button === 1) {
             event.preventDefault();
             const position = screenToFlowPosition({
                 x: event.clientX,
                 y: event.clientY
             });
+
+            // Snap to grid
             position.x = Math.round(position.x / 40) * 40;
             position.y = Math.round(position.y / 40) * 40;
+
             vscode.postMessage({ command: 'createNote', position });
             return;
         }
-
-        // Ignore Right Click (Button 2) as it's handled by onContextMenu
-        if (event.button === 2) {
-            return;
-        }
-
-        // Handle Tool Creation
-        if (activeTool !== 'select' && activeTool !== 'hand') {
-            const position = screenToFlowPosition({
-                x: event.clientX,
-                y: event.clientY
-            });
-            // Snap
-            position.x = Math.round(position.x / 40) * 40;
-            position.y = Math.round(position.y / 40) * 40;
-
-            const id = uuidv4();
-            let newNode: Node;
-
-            const commonData = {
-                onContentChange: (id: string, content: string) => {
-                    setNodes(nds => nds.map(n => n.id === id ? { ...n, data: { ...n.data, content } } : n));
-                    // Debounce save if needed, or just rely on next save
-                },
-                onLabelChange: (id: string, label: string) => {
-                    setNodes(nds => nds.map(n => n.id === id ? { ...n, data: { ...n.data, label } } : n));
-                }
-            };
-
-            if (activeTool === 'sticky') {
-                newNode = {
-                    id,
-                    type: 'sticky',
-                    position,
-                    data: { ...commonData, content: '' }
-                };
-            } else if (activeTool === 'text') {
-                newNode = {
-                    id,
-                    type: 'text',
-                    position,
-                    data: { ...commonData, content: 'Text' }
-                };
-            } else if (activeTool === 'shape-rect') {
-                newNode = {
-                    id,
-                    type: 'shape',
-                    position,
-                    data: { ...commonData, shapeType: 'rect', style: { backgroundColor: 'transparent', borderColor: '#ffffff' } },
-                    style: { width: 100, height: 100 }
-                };
-            } else if (activeTool === 'shape-circle') {
-                newNode = {
-                    id,
-                    type: 'shape',
-                    position,
-                    data: { ...commonData, shapeType: 'circle', style: { backgroundColor: 'transparent', borderColor: '#ffffff' } },
-                    style: { width: 100, height: 100 }
-                };
-            } else if (activeTool === 'group') {
-                newNode = {
-                    id,
-                    type: 'group',
-                    position,
-                    data: { ...commonData, label: 'Group' },
-                    style: { width: 200, height: 200 },
-                    zIndex: -1
-                };
-            }
-
-            if (newNode!) {
-                setNodes((nds) => nds.concat(newNode));
-                setActiveTool('select'); // Reset to select after creation
-                setTimeout(() => saveLayout(), 0);
-            }
-            return;
-        }
-
         setMenu(null);
-    }, [screenToFlowPosition, activeTool, setNodes, saveLayout]);
+    }, [screenToFlowPosition]);
 
     const createNote = useCallback(() => {
         if (menu && !menu.nodeId) {
@@ -396,20 +315,15 @@ const App = () => {
                 // Convert MetroLayout to ReactFlow nodes/edges
                 const newNodes: Node[] = layout.nodes.map(n => ({
                     id: n.id,
-                    type: n.type === 'file' ? 'station' : (n.type || 'station'), // Map file to station, others keep type
+                    type: 'station', // Custom type
                     position: n.position,
-                    width: n.width,
-                    height: n.height,
-                    zIndex: n.type === 'group' ? -1 : undefined,
                     data: {
                         label: n.label,
                         filePath: n.filePath,
                         status: n.status,
-                        color: n.color,
-                        mark: n.mark,
-                        content: n.content,
-                        style: n.style,
-                        shapeType: n.shapeType || (n.style?.borderRadius ? 'rect' : 'rect'), // Fallback
+                        color: n.color, // Restore color
+                        mark: n.mark, // Restore mark
+                        completed: n.completed, // Restore completion status
                         isConnectionMode: false,
                         onRename: (id: string, oldPath: string) => {
                             vscode.postMessage({
@@ -417,12 +331,6 @@ const App = () => {
                                 id,
                                 oldPath
                             });
-                        },
-                        onContentChange: (id: string, content: string) => {
-                            setNodes(nds => nds.map(n => n.id === id ? { ...n, data: { ...n.data, content } } : n));
-                        },
-                        onLabelChange: (id: string, label: string) => {
-                            setNodes(nds => nds.map(n => n.id === id ? { ...n, data: { ...n.data, label } } : n));
                         }
                     },
                 }));
@@ -439,7 +347,12 @@ const App = () => {
                             source: e.source,
                             target: e.target,
                             type: 'straight',
-                            style: { stroke: color, strokeWidth: 4 }
+                            style: { stroke: color, strokeWidth: 4 },
+                            label: e.label,
+                            labelStyle: { fill: 'var(--vscode-foreground)', fontSize: 12, fontWeight: 500 },
+                            labelBgStyle: { fill: 'var(--vscode-editor-background)', fillOpacity: 0.8, fillRule: 'evenodd' },
+                            labelBgPadding: [4, 2],
+                            labelBgBorderRadius: 4,
                         };
                     });
                     setEdges(newEdges);
@@ -629,10 +542,15 @@ const App = () => {
     );
 
     const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
-        // Handle Ctrl/Cmd + Click for Default Mark
+        // Handle Ctrl/Cmd + Click for Default Mark or Task Toggle
         if (event.ctrlKey || event.metaKey) {
             setNodes((nds) => nds.map(n => {
                 if (n.id === node.id) {
+                    // Task Marker specific toggle
+                    if (n.data.mark === 'task') {
+                        return { ...n, data: { ...n.data, completed: !n.data.completed } };
+                    }
+                    // Default behavior for other nodes
                     const currentMark = n.data.mark;
                     const newMark = currentMark === 'default' ? 'none' : 'default';
                     return { ...n, data: { ...n.data, mark: newMark } };
@@ -652,6 +570,57 @@ const App = () => {
             console.warn('Node has no filePath:', node);
         }
     }, []);
+
+    const onEdgeDoubleClick = useCallback((event: React.MouseEvent, edge: Edge) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        // Calculate position relative to the pane
+        const pane = reactFlowWrapper.current?.getBoundingClientRect();
+        if (pane) {
+            setEditingEdge({
+                id: edge.id,
+                x: event.clientX - pane.left,
+                y: event.clientY - pane.top,
+                label: (edge.label as string) || ''
+            });
+        }
+    }, []);
+
+    const onEdgeLabelChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        if (editingEdge) {
+            setEditingEdge({ ...editingEdge, label: e.target.value });
+        }
+    }, [editingEdge]);
+
+    const onEdgeLabelSubmit = useCallback(() => {
+        if (editingEdge) {
+            setEdges((eds) => eds.map(e => {
+                if (e.id === editingEdge.id) {
+                    return {
+                        ...e,
+                        label: editingEdge.label,
+                        labelStyle: { fill: 'var(--vscode-foreground)', fontSize: 12, fontWeight: 500 },
+                        labelBgStyle: { fill: 'var(--vscode-editor-background)', fillOpacity: 0.8, fillRule: 'evenodd' },
+                        labelBgPadding: [4, 2],
+                        labelBgBorderRadius: 4,
+                    };
+                }
+                return e;
+            }));
+            setEditingEdge(null);
+            setTimeout(() => saveLayout(), 0);
+        }
+    }, [editingEdge, setEdges, saveLayout]);
+
+    // Key handler for input
+    const onEdgeLabelKeyDown = useCallback((e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            onEdgeLabelSubmit();
+        } else if (e.key === 'Escape') {
+            setEditingEdge(null);
+        }
+    }, [onEdgeLabelSubmit]);
 
     const onNodeDragStart = useCallback((event: React.MouseEvent, node: Node) => {
         // Do nothing on start to allow clicks to pass through
@@ -773,7 +742,7 @@ const App = () => {
         setMenu(null);
     }, [nodes, setNodes, setEdges, saveLayout]);
 
-    const batchMark = useCallback((mark: 'none' | 'default' | 'check' | 'star') => {
+    const batchMark = useCallback((mark: 'none' | 'default' | 'check' | 'star' | 'coordinate' | 'task') => {
         const selectedNodes = nodes.filter(n => n.selected);
         if (selectedNodes.length > 0) {
             setNodes((nds) => nds.map(n => {
@@ -839,25 +808,37 @@ const App = () => {
                         {
                             label: 'None', onClick: () => {
                                 setNodes(nds => nds.map(n => n.id === menu.nodeId ? { ...n, data: { ...n.data, mark: 'none' } } : n));
-                                setMenu(null); setTimeout(() => saveLayout(), 0);
+                                setMenu(null); saveLayout();
                             }
                         },
                         {
                             label: 'Default (Circle)', onClick: () => {
                                 setNodes(nds => nds.map(n => n.id === menu.nodeId ? { ...n, data: { ...n.data, mark: 'default' } } : n));
-                                setMenu(null); setTimeout(() => saveLayout(), 0);
+                                setMenu(null); saveLayout();
                             }
                         },
                         {
                             label: 'Check (✓)', onClick: () => {
                                 setNodes(nds => nds.map(n => n.id === menu.nodeId ? { ...n, data: { ...n.data, mark: 'check' } } : n));
-                                setMenu(null); setTimeout(() => saveLayout(), 0);
+                                setMenu(null); saveLayout();
                             }
                         },
                         {
                             label: 'Star (★)', onClick: () => {
                                 setNodes(nds => nds.map(n => n.id === menu.nodeId ? { ...n, data: { ...n.data, mark: 'star' } } : n));
-                                setMenu(null); setTimeout(() => saveLayout(), 0);
+                                setMenu(null); saveLayout();
+                            }
+                        },
+                        {
+                            label: 'Coordinate (+)', onClick: () => {
+                                setNodes(nds => nds.map(n => n.id === menu.nodeId ? { ...n, data: { ...n.data, mark: 'coordinate' } } : n));
+                                setMenu(null); saveLayout();
+                            }
+                        },
+                        {
+                            label: 'Task (■)', onClick: () => {
+                                setNodes(nds => nds.map(n => n.id === menu.nodeId ? { ...n, data: { ...n.data, mark: 'task' } } : n));
+                                setMenu(null); saveLayout();
                             }
                         }
                     ]
@@ -906,7 +887,9 @@ const App = () => {
                             { label: 'None', onClick: () => batchMark('none') },
                             { label: 'Default (Circle)', onClick: () => batchMark('default') },
                             { label: 'Check (✓)', onClick: () => batchMark('check') },
-                            { label: 'Star (★)', onClick: () => batchMark('star') }
+                            { label: 'Star (★)', onClick: () => batchMark('star') },
+                            { label: 'Coordinate (+)', onClick: () => batchMark('coordinate') },
+                            { label: 'Task (■)', onClick: () => batchMark('task') }
                         ]
                     },
                     {
@@ -960,6 +943,7 @@ const App = () => {
                 onConnectEnd={onConnectEnd}
                 onNodeClick={onNodeClick}
                 onNodeDoubleClick={onNodeDoubleClick}
+                onEdgeDoubleClick={onEdgeDoubleClick}
                 onNodeDragStart={onNodeDragStart}
                 onNodeDrag={onNodeDrag}
                 onNodeDragStop={onNodeDragStop}
@@ -976,7 +960,10 @@ const App = () => {
                 zoomOnScroll={!zoomLocked}
                 zoomOnPinch={!zoomLocked}
                 zoomOnDoubleClick={!zoomLocked}
-                panOnDrag={[0]} // Only left click pans, freeing up middle click
+                panActivationKeyCode="Space"
+                selectionOnDrag={true}
+                selectionKeyCode={null}
+                panOnDrag={false}
                 fitView={!isLoaded && !isLocal}
                 proOptions={{ hideAttribution: true }}
             >
@@ -1033,8 +1020,39 @@ const App = () => {
                     />
                 )}
                 {!isLocal && (
-                    <Panel position="bottom-center">
-                        <Toolbar activeTool={activeTool} onToolChange={setActiveTool} />
+                    <Panel position="top-left" style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                        <NavigationPanel
+                            title="Coordinates"
+                            nodes={nodes.filter(n => n.data.mark === 'coordinate')}
+                            type="coordinate"
+                            onNavigate={(id) => {
+                                const node = nodes.find(n => n.id === id);
+                                if (node) {
+                                    setCenter(node.position.x, node.position.y, { zoom: 1, duration: 800 });
+                                }
+                            }}
+                        />
+
+                        <NavigationPanel
+                            title="Tasks"
+                            nodes={nodes.filter(n => n.data.mark === 'task')}
+                            type="task"
+                            onNavigate={(id) => {
+                                const node = nodes.find(n => n.id === id);
+                                if (node) {
+                                    setCenter(node.position.x, node.position.y, { zoom: 1, duration: 800 });
+                                }
+                            }}
+                            onToggle={(id) => {
+                                setNodes((nds) => nds.map(n => {
+                                    if (n.id === id) {
+                                        return { ...n, data: { ...n.data, completed: !n.data.completed } };
+                                    }
+                                    return n;
+                                }));
+                                setTimeout(() => saveLayout(), 0);
+                            }}
+                        />
                     </Panel>
                 )}
                 {!isLocal && (
@@ -1065,6 +1083,32 @@ const App = () => {
                             Reset View
                         </button>
                     </Panel>
+                )}
+                {editingEdge && (
+                    <div style={{
+                        position: 'absolute',
+                        left: editingEdge.x,
+                        top: editingEdge.y,
+                        transform: 'translate(-50%, -50%)',
+                        zIndex: 2000,
+                    }}>
+                        <input
+                            autoFocus
+                            value={editingEdge.label}
+                            onChange={onEdgeLabelChange}
+                            onKeyDown={onEdgeLabelKeyDown}
+                            onBlur={onEdgeLabelSubmit}
+                            style={{
+                                background: 'var(--vscode-input-background)',
+                                color: 'var(--vscode-input-foreground)',
+                                border: '1px solid var(--vscode-input-border)',
+                                borderRadius: '4px',
+                                padding: '4px 8px',
+                                fontSize: '12px',
+                                outline: 'none'
+                            }}
+                        />
+                    </div>
                 )}
                 {menu && (
                     <ContextMenu

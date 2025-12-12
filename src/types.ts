@@ -1,39 +1,35 @@
 export interface MetroNode {
     id: string;
-    type: 'file' | 'station' | 'sticky' | 'text' | 'shape' | 'group';
-    filePath?: string; // Absolute path (for files)
+    type: 'file' | 'note';
+    filePath: string; // Absolute path
     position: { x: number; y: number };
     label?: string;
     parentId?: string; // For groups
     status?: 'active' | 'missing';
-    color?: string; // Custom color or background color
-    mark?: 'none' | 'default' | 'check' | 'star';
+    color?: string; // Custom color
+    mark?: 'none' | 'default' | 'check' | 'star' | 'coordinate' | 'task';
+    completed?: boolean;
+}
 
-    // Whiteboard specific
-    content?: string; // Markdown content for notes/text
-    shapeType?: 'rect' | 'circle';
-    width?: number;
-    height?: number;
-    style?: {
-        backgroundColor?: string;
-        borderColor?: string;
-        borderStyle?: string;
-        borderWidth?: number;
-        borderRadius?: number;
-        fontSize?: number;
-        textAlign?: 'left' | 'center' | 'right';
-    };
+export interface MetroGroup {
+    id: string;
+    label: string;
+    position: { x: number; y: number };
+    width: number;
+    height: number;
+    style?: any;
 }
 
 export interface MetroEdge {
     id: string;
     source: string;
     target: string;
-    style?: any;
+    label?: string; // Connection annotation
 }
 
 export interface MetroLayout {
     nodes: MetroNode[];
+    groups: MetroGroup[];
     edges: MetroEdge[];
     viewport?: { x: number; y: number; zoom: number };
     zoomLocked?: boolean;

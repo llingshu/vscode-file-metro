@@ -9,7 +9,7 @@ const StationNode = ({ id, data, selected }: NodeProps) => {
 
     return (
         <div
-            className={`station-node ${selected ? 'selected' : ''} ${data.status === 'missing' ? 'missing' : ''} ${data.isConnectionMode ? 'connection-target' : ''} ${data.isGhost ? 'ghost' : ''}`}
+            className={`station-node ${selected ? 'selected' : ''} ${data.status === 'missing' ? 'missing' : ''} ${data.isConnectionMode ? 'connection-target' : ''} ${data.isGhost ? 'ghost' : ''} ${data.mark === 'task' ? 'is-task' : ''} ${data.completed ? 'completed' : ''}`}
             style={style}
             onAuxClick={(e) => {
                 // Middle Click (Button 1)
@@ -45,6 +45,7 @@ const StationNode = ({ id, data, selected }: NodeProps) => {
                 >
                     {data.mark === 'check' && '✓'}
                     {data.mark === 'star' && '★'}
+                    {/* Coordinate mark uses CSS pseudo-elements */}
                 </div>
             )}
         </div>

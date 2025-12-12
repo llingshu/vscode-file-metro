@@ -3,8 +3,16 @@
 All notable changes to this project will be documented in this file.
 
 ## [0.2.0]
+### Added
+- **Advanced Markers**: Added 'Coordinate' (+) and 'Task' (■) markers.
+- **Task Management**: Tasks can be completed (Green status) via `Ctrl+Click` or from the side panel.
+- **Navigation Panels**: Quick navigation panels for Coordinates and Tasks with interactive checkboxes.
+- **Connection Annotations**: Double-click connections to add text labels.
+
 ### Changed
-- **Rebranding**: Renamed extension to **Metro Code Board: Architecture & Whiteboard** to reflect the new vision.
+- **Rebranding**: Renamed extension to **Metro Code Board: Architecture & Whiteboard**.
+- **Interactions**: Panning is now `Space + Left Drag`, Box Selection is `Left Drag`.
+- **UI Polish**: Fixed Context Menu auto-closing and default cursor styles.
 
 ## [0.1.3]
 ### Fixed
