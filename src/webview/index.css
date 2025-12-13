@@ -147,7 +147,11 @@ body.is-connecting .station-handle.center.source::after {
 }
 
 .react-flow__pane {
-    cursor: default !important;
+    cursor: grab !important;
+}
+
+.react-flow__pane:active {
+    cursor: grabbing !important;
 }
 
 /* Context Menu */

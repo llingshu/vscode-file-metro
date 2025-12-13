@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.1]
+### Changed
+- **Interactions**: Reverted panning to default `Left Drag`, Box Selection is `Shift + Left Drag` (Previously changed in 0.2.0 but reverted for usability).
+
 ## [0.2.0]
 ### Added
 - **Advanced Markers**: Added 'Coordinate' (+) and 'Task' (■) markers.
@@ -11,7 +15,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - **Rebranding**: Renamed extension to **Metro Code Board: Architecture & Whiteboard**.
-- **Interactions**: Panning is now `Space + Left Drag`, Box Selection is `Left Drag`.
+- **Interactions**: Panning was temporarily `Space + Drag` (Reverted in 0.2.1).
 - **UI Polish**: Fixed Context Menu auto-closing and default cursor styles.
 
 ## [0.1.3]

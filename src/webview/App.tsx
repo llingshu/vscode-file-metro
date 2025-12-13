@@ -959,11 +959,12 @@ const App = () => {
                 // Zoom Lock Logic
                 zoomOnScroll={!zoomLocked}
                 zoomOnPinch={!zoomLocked}
-                zoomOnDoubleClick={!zoomLocked}
-                panActivationKeyCode="Space"
-                selectionOnDrag={true}
-                selectionKeyCode={null}
-                panOnDrag={false}
+                panOnScroll={true}
+                zoomOnDoubleClick={false}
+                selectionOnDrag={false}
+                selectionKeyCode="Shift"
+                panActivationKeyCode={null}
+                panOnDrag={true}
                 fitView={!isLoaded && !isLocal}
                 proOptions={{ hideAttribution: true }}
             >

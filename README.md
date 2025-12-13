@@ -1,9 +1,9 @@
-# Metro Code Board
+# Metro Whiteboard
 (Formerly File Metro)
 
-![Metro Code Board Banner](images/banner.jpg)
+![Metro Whiteboard Banner](images/banner.jpg)
 
-**Metro Code Board** is an infinite canvas for your code. It visualizes your workspace as a metro map, allowing you to see connections, plan architecture, and think spatially.
+**Metro Whiteboard** is an infinite canvas for your code. It visualizes your workspace as a metro map, allowing you to see connections, plan architecture, and think spatially.
 
 ## Vision: The Infinite Code Canvas
 
