@@ -48,7 +48,9 @@ export class FileTracker {
             filePath: filePath,
             position: position,
             label: fileName,
-            status: 'active'
+            status: 'active',
+            mark: 'none',
+            color: ['#e3002c', '#007fd4', '#008000', '#f3a900', '#800080', '#ff7f00', '#a0a0a0'][Math.floor(Math.random() * 7)] // Assign random color
         };
 
         this.currentLayout.nodes.push(newNode);

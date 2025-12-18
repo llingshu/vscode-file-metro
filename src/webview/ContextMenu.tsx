@@ -19,18 +19,43 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ x, y, items, onClose }) => {
     const [activeSubmenuIndex, setActiveSubmenuIndex] = useState<number | null>(null);
     const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
+    const openTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
     const handleItemMouseEnter = (index: number) => {
+        // If we are entering an item, we should cancel any pending "close all" from leaving the menu
         if (timeoutRef.current) {
             clearTimeout(timeoutRef.current);
             timeoutRef.current = null;
         }
-        setActiveSubmenuIndex(index);
+
+        // Always clear any pending switch to another item (e.g. if we crossed B to get back to A/Submenu A)
+        if (openTimeoutRef.current) {
+            clearTimeout(openTimeoutRef.current);
+            openTimeoutRef.current = null;
+        }
+
+        // If we are already on this item, do nothing further
+        if (activeSubmenuIndex === index) return;
+
+        // Debounce switching items to allow "diagonal" movement
+        // If we are switching from A to B, keep A open for a short delay
+        openTimeoutRef.current = setTimeout(() => {
+            setActiveSubmenuIndex(index);
+        }, 100);
     };
 
     const handleItemMouseLeave = () => {
+        // If we leave the menu entirely (or the item), schedule a close
+        // But wait... this is on the PARENT container.
+
+        if (openTimeoutRef.current) {
+            clearTimeout(openTimeoutRef.current);
+            openTimeoutRef.current = null;
+        }
+
         timeoutRef.current = setTimeout(() => {
             setActiveSubmenuIndex(null);
-        }, 300);
+        }, 800);
     };
 
     return (
@@ -43,6 +68,9 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ x, y, items, onClose }) => {
                     clearTimeout(timeoutRef.current);
                     timeoutRef.current = null;
                 }
+                // Also clear open timeout if we re-entered the general menu area?
+                // Actually handleItemMouseEnter covers specific items.
+                // This handler is for the global container.
             }}
         >
             {items.map((item, index) => (
@@ -95,7 +123,10 @@ const ContextMenuItem: React.FC<{
             {item.submenu && <span className="submenu-arrow">›</span>}
 
             {item.submenu && isActive && (
-                <div className="context-submenu">
+                <div
+                    className="context-submenu"
+                    onMouseEnter={onMouseEnter}
+                >
                     {item.submenu.map((subItem, index) => (
                         <ContextMenuItem
                             key={index}

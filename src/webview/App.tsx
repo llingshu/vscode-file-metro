@@ -519,6 +519,7 @@ const App = () => {
                             filePath,
                             status: 'active',
                             color: METRO_COLORS[Math.floor(Math.random() * METRO_COLORS.length)],
+                            mark: 'none', // Explicitly initialize mark
                             onRename: (id: string, oldPath: string) => {
                                 vscode.postMessage({
                                     command: 'renameNode',
@@ -832,15 +833,18 @@ const App = () => {
                         {
                             label: 'Coordinate (+)', onClick: () => {
                                 setNodes(nds => nds.map(n => n.id === menu.nodeId ? { ...n, data: { ...n.data, mark: 'coordinate' } } : n));
-                                setMenu(null); saveLayout();
+                                setMenu(null);
+                                setTimeout(() => saveLayout(), 0);
                             }
                         },
                         {
                             label: 'Task (■)', onClick: () => {
                                 setNodes(nds => nds.map(n => n.id === menu.nodeId ? { ...n, data: { ...n.data, mark: 'task' } } : n));
-                                setMenu(null); saveLayout();
+                                setMenu(null);
+                                setTimeout(() => saveLayout(), 0);
                             }
-                        }
+                        },
+
                     ]
                 },
                 {

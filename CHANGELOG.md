@@ -2,9 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.2]
+### Changed
+- **Context Menu**: Improved stability with a 0.5s closing delay and smart gap detection to prevent accidental closing.
+- **Visuals**:
+    - **Coordinate Marker**: New SVG design with thicker lines that match the node's color.
+    - **Tasks**: Completed tasks now display as a solid filled square (matching node color) instead of green.
+- **New Notes**: Newly created notes are now automatically assigned a random color.
+
 ## [0.2.1]
 ### Changed
-- **Interactions**: Reverted panning to default `Left Drag`, Box Selection is `Shift + Left Drag` (Previously changed in 0.2.0 but reverted for usability).
+- **Interactions**: Reverted panning to default `Left Drag`, Box Selection is `Shift + Left Drag`.
 
 ## [0.2.0]
 ### Added

@@ -4,7 +4,9 @@ import { Handle, Position, NodeProps } from 'reactflow';
 const StationNode = ({ id, data, selected }: NodeProps) => {
     const style = data.color ? {
         borderColor: data.color,
-        boxShadow: `0 0 0 2px ${data.color}33` // Subtle glow with same color
+        boxShadow: `0 0 0 2px ${data.color}33`, // Subtle glow with same color
+        backgroundColor: data.completed ? data.color : undefined, // Solid fill if completed
+        color: data.completed ? '#ffffff' : undefined // White text if filled (assuming dark colors)
     } : {};
 
     return (
@@ -45,7 +47,15 @@ const StationNode = ({ id, data, selected }: NodeProps) => {
                 >
                     {data.mark === 'check' && '✓'}
                     {data.mark === 'star' && '★'}
-                    {/* Coordinate mark uses CSS pseudo-elements */}
+                    {data.mark === 'coordinate' && (
+                        <div style={{ color: data.color || 'var(--vscode-editor-foreground)' }}>
+                            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2.5" fill="none" style={{ display: 'block' }}>
+                                <circle cx="12" cy="12" r="6" />
+                                <line x1="12" y1="0" x2="12" y2="24" />
+                                <line x1="0" y1="12" x2="24" y2="12" />
+                            </svg>
+                        </div>
+                    )}
                 </div>
             )}
         </div>
