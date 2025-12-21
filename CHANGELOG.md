@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.4]
+### Added
+- **Visuals**:
+    - **Mark Styles**: 
+        - **Solid (Default)**: Default mark is now a Solid Circle.
+        - **Blank**: Added "Blank" (Hollow Ring) style.
+        - **Hollow**: Preserved "Hollow" option for compatibility.
+
+### Changed
+- **Visuals**:
+    - **Icon**: Updated extension icon to a more representative metro map style with a prominent station.
+
 ## [0.2.3]
 ### Added
 - **Sidebar**: Restructured into 4 stacked panels (Plan, Tasks, Coordinates, History) for better organization.

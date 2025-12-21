@@ -5,8 +5,10 @@ const StationNode = ({ id, data, selected }: NodeProps) => {
     const style = data.color ? {
         borderColor: data.color,
         boxShadow: `0 0 0 2px ${data.color}33`, // Subtle glow with same color
-        backgroundColor: data.completed ? data.color : undefined, // Solid fill if completed
-        color: data.completed ? '#ffffff' : undefined // White text if filled (assuming dark colors)
+        // Solid fill if completed OR if mark is 'none' (or undefined)
+        // Mark 'blank' (or 'hollow') explicitly makes it hollow (undefined bg)
+        backgroundColor: (data.completed || !data.mark || data.mark === 'none') ? data.color : undefined,
+        color: (data.completed || !data.mark || data.mark === 'none') ? '#ffffff' : undefined // White text if filled
     } : {};
 
     return (
@@ -43,7 +45,10 @@ const StationNode = ({ id, data, selected }: NodeProps) => {
             {data.mark && data.mark !== 'none' && (
                 <div
                     className={`station-mark mark-${data.mark}`}
-                    style={{ backgroundColor: data.mark === 'default' ? data.color : undefined }}
+                    style={{
+                        backgroundColor: data.mark === 'default' ? data.color : undefined,
+                        borderColor: (data.mark === 'hollow' || data.mark === 'blank') ? data.color : undefined
+                    }}
                 >
                     {data.mark === 'check' && '✓'}
                     {data.mark === 'star' && '★'}

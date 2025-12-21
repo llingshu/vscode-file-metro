@@ -774,7 +774,7 @@ const App = () => {
         setMenu(null);
     }, [nodes, setNodes, setEdges, saveLayout]);
 
-    const batchMark = useCallback((mark: 'none' | 'default' | 'check' | 'star' | 'coordinate' | 'task') => {
+    const batchMark = useCallback((mark: 'none' | 'default' | 'check' | 'star' | 'coordinate' | 'task' | 'hollow' | 'blank') => {
         const selectedNodes = nodes.filter(n => n.selected);
         if (selectedNodes.length > 0) {
             setNodes((nds) => nds.map(n => {
@@ -815,7 +815,9 @@ const App = () => {
                     {
                         label: `Batch Mark (${selectedNodes.length})`,
                         submenu: [
-                            { label: 'None', onClick: () => batchMark('none') },
+                            { label: 'Solid (Default)', onClick: () => batchMark('none') },
+                            { label: 'Blank (Ring)', onClick: () => batchMark('blank') },
+                            { label: 'Hollow', onClick: () => batchMark('hollow') },
                             { label: 'Default (Circle)', onClick: () => batchMark('default') },
                             { label: 'Check (✓)', onClick: () => batchMark('check') },
                             { label: 'Star (★)', onClick: () => batchMark('star') }
@@ -838,8 +840,20 @@ const App = () => {
                     label: 'Mark',
                     submenu: [
                         {
-                            label: 'None', onClick: () => {
+                            label: 'Solid (Default)', onClick: () => {
                                 setNodes(nds => nds.map(n => n.id === menu.nodeId ? { ...n, data: { ...n.data, mark: 'none' } } : n));
+                                setMenu(null); saveLayout();
+                            }
+                        },
+                        {
+                            label: 'Blank (Ring)', onClick: () => {
+                                setNodes(nds => nds.map(n => n.id === menu.nodeId ? { ...n, data: { ...n.data, mark: 'blank' } } : n));
+                                setMenu(null); saveLayout();
+                            }
+                        },
+                        {
+                            label: 'Hollow', onClick: () => {
+                                setNodes(nds => nds.map(n => n.id === menu.nodeId ? { ...n, data: { ...n.data, mark: 'hollow' } } : n));
                                 setMenu(null); saveLayout();
                             }
                         },
@@ -919,7 +933,9 @@ const App = () => {
                     {
                         label: `Batch Mark (${selectedNodes.length})`,
                         submenu: [
-                            { label: 'None', onClick: () => batchMark('none') },
+                            { label: 'Solid (Default)', onClick: () => batchMark('none') },
+                            { label: 'Blank (Ring)', onClick: () => batchMark('blank') },
+                            { label: 'Hollow', onClick: () => batchMark('hollow') },
                             { label: 'Default (Circle)', onClick: () => batchMark('default') },
                             { label: 'Check (✓)', onClick: () => batchMark('check') },
                             { label: 'Star (★)', onClick: () => batchMark('star') },

@@ -362,6 +362,15 @@ body.is-connecting .station-handle.center.source::after {
     /* Fallback */
 }
 
+.station-mark.mark-hollow {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    border-width: 2px;
+    border-style: solid;
+    background: transparent;
+}
+
 .station-mark.mark-check {
     color: var(--vscode-testing-iconPassed);
     font-size: 14px;

@@ -7,7 +7,7 @@
     "type": "git",
     "url": "https://github.com/llingshu/vscode-file-metro"
   },
-  "version": "0.2.3",
+  "version": "0.2.4",
   "icon": "images/icon.png",
   "license": "MIT",
   "engines": {
