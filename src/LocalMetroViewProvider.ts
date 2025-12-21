@@ -72,6 +72,19 @@ export class LocalMetroViewProvider implements vscode.WebviewViewProvider {
         }
     }
 
+    public isVisible(): boolean {
+        return !!this._view?.visible;
+    }
+
+    public focusNode(nodeId: string) {
+        if (this._view) {
+            this._view.webview.postMessage({
+                command: 'focusNode',
+                nodeId: nodeId
+            });
+        }
+    }
+
     private _getHtmlForWebview(webview: vscode.Webview) {
         const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'dist', 'webview.js'));
         const nonce = getNonce();

@@ -56,13 +56,25 @@ export class MetroSidebarProvider implements vscode.TreeDataProvider<SidebarItem
 
     private getGhostTasksItems(): SidebarItem[] {
         const ghosts = this.getGhostTasks();
-        return ghosts.map(g => new SidebarItem(
-            g.label,
-            vscode.TreeItemCollapsibleState.None,
-            'ghost-task',
-            undefined,
-            `ghost-${g.id}`
-        ));
+        return ghosts.map(g => {
+            const item = new SidebarItem(
+                g.label,
+                vscode.TreeItemCollapsibleState.None,
+                'ghost-task',
+                undefined,
+                `ghost-${g.id}`
+            );
+
+            // Use square icon for consistency with Plan style
+            // Ghost tasks are Plan tasks
+            const color = '#e3002c'; // Red for Plan? Or just use blue/default? Let's use Red for high viz or stick to #007fd4. 
+            // Actually, Plan nodes on map default to blue or user color. Let's use blue default.
+            const planColor = '#007fd4';
+            const svgDataUri = this.getSquareIconSvg(planColor, g.completed || false);
+            item.iconPath = vscode.Uri.parse(svgDataUri);
+
+            return item;
+        });
     }
 
     private getCoordinateItems(): SidebarItem[] {
@@ -124,11 +136,11 @@ export class MetroSidebarProvider implements vscode.TreeDataProvider<SidebarItem
                     undefined, // NO resourceUri to kill the default file icon
                     `unlinked-${t.filePath}`
                 );
-                // Set manual open command
+                // Set command to focusNode (which will do nothing if unlinked, satisfying "single click no reaction")
                 item.command = {
-                    command: 'vscode.open',
-                    title: 'Open File',
-                    arguments: [vscode.Uri.file(t.filePath)]
+                    command: 'metro.focusNode',
+                    title: 'Focus Node',
+                    arguments: [item] // Pass item to let command handler decide (hack for double click detection)
                 };
                 item.tooltip = t.filePath;
                 item.contextValue = (item.contextValue || '') + ' can-open';
@@ -178,7 +190,7 @@ export class MetroSidebarProvider implements vscode.TreeDataProvider<SidebarItem
             item.command = {
                 command: 'metro.focusNode',
                 title: 'Focus Node',
-                arguments: [node.id]
+                arguments: [item] // Changed from [node.id] to item object for consistency
             };
             item.tooltip = node.filePath;
             item.contextValue = (item.contextValue || '') + ' can-open';
@@ -187,7 +199,7 @@ export class MetroSidebarProvider implements vscode.TreeDataProvider<SidebarItem
             item.command = {
                 command: 'metro.focusNode',
                 title: 'Focus Node',
-                arguments: [node.id]
+                arguments: [item]
             };
         }
 
@@ -244,13 +256,15 @@ export class MetroSidebarProvider implements vscode.TreeDataProvider<SidebarItem
 
     // --- Ghost Tasks Management ---
 
-    public getGhostTasks(): { id: string; label: string }[] {
+    // --- Ghost Tasks Management ---
+
+    public getGhostTasks(): { id: string; label: string; completed?: boolean }[] {
         return this._context.workspaceState.get(MetroSidebarProvider.GHOST_TASKS_KEY, []);
     }
 
     public async addGhostTask(label: string) {
         const ghosts = this.getGhostTasks();
-        const newGhost = { id: `ghost-${Date.now()}`, label };
+        const newGhost = { id: `ghost-${Date.now()}`, label, completed: false };
         await this._context.workspaceState.update(MetroSidebarProvider.GHOST_TASKS_KEY, [...ghosts, newGhost]);
         this.refresh();
     }
@@ -258,6 +272,18 @@ export class MetroSidebarProvider implements vscode.TreeDataProvider<SidebarItem
     public async removeGhostTask(id: string) {
         const ghosts = this.getGhostTasks();
         const updated = ghosts.filter(g => `ghost-${g.id}` !== id && g.id !== id); // Handle ID format flexibility
+        await this._context.workspaceState.update(MetroSidebarProvider.GHOST_TASKS_KEY, updated);
+        this.refresh();
+    }
+
+    public async toggleGhostTaskCompletion(id: string) {
+        const ghosts = this.getGhostTasks();
+        const updated = ghosts.map(g => {
+            if (`ghost-${g.id}` === id || g.id === id) {
+                return { ...g, completed: !g.completed };
+            }
+            return g;
+        });
         await this._context.workspaceState.update(MetroSidebarProvider.GHOST_TASKS_KEY, updated);
         this.refresh();
     }

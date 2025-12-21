@@ -7,7 +7,7 @@
     "type": "git",
     "url": "https://github.com/llingshu/vscode-file-metro"
   },
-  "version": "0.2.4",
+  "version": "0.2.5",
   "icon": "images/icon.png",
   "license": "MIT",
   "engines": {
@@ -116,6 +116,11 @@
         {
           "command": "metro.toggleTaskCompletion",
           "when": "viewItem =~ /task-node/ && (view == metro.view.tasks || view == metro.view.done)",
+          "group": "inline"
+        },
+        {
+          "command": "metro.toggleTaskCompletion",
+          "when": "view == metro.view.plan && viewItem == ghost-task",
           "group": "inline"
         },
         {

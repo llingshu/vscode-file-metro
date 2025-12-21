@@ -238,6 +238,19 @@ const App = () => {
         }
     }, [menu, nodes]);
 
+    const toggleComplete = useCallback((id: string) => {
+        setNodes((nds) => {
+            const newNodes = nds.map(n => {
+                if (n.id === id) {
+                    return { ...n, data: { ...n.data, completed: !n.data.completed } };
+                }
+                return n;
+            });
+            return newNodes;
+        });
+        setTimeout(() => saveLayout(), 50);
+    }, [setNodes, saveLayout]);
+
     const onNodesChange = useCallback(
         (changes: NodeChange[]) => {
             // Intercept position changes to enforce snapping on Real Nodes
@@ -331,7 +344,8 @@ const App = () => {
                                 id,
                                 oldPath
                             });
-                        }
+                        },
+                        onToggleComplete: toggleComplete
                     },
                 }));
                 setNodes(newNodes);
@@ -774,7 +788,7 @@ const App = () => {
         setMenu(null);
     }, [nodes, setNodes, setEdges, saveLayout]);
 
-    const batchMark = useCallback((mark: 'none' | 'default' | 'check' | 'star' | 'coordinate' | 'task' | 'hollow' | 'blank') => {
+    const batchMark = useCallback((mark: 'none' | 'default' | 'check' | 'star' | 'coordinate' | 'task' | 'hollow' | 'blank' | 'plan') => {
         const selectedNodes = nodes.filter(n => n.selected);
         if (selectedNodes.length > 0) {
             setNodes((nds) => nds.map(n => {
@@ -820,7 +834,10 @@ const App = () => {
                             { label: 'Hollow', onClick: () => batchMark('hollow') },
                             { label: 'Default (Circle)', onClick: () => batchMark('default') },
                             { label: 'Check (✓)', onClick: () => batchMark('check') },
-                            { label: 'Star (★)', onClick: () => batchMark('star') }
+                            { label: 'Star (★)', onClick: () => batchMark('star') },
+                            { label: 'Coordinate (+)', onClick: () => batchMark('coordinate') },
+                            { label: 'Task (■)', onClick: () => batchMark('task') },
+                            { label: 'Plan', onClick: () => batchMark('plan') }
                         ]
                     },
                     {
@@ -889,6 +906,13 @@ const App = () => {
                                 setTimeout(() => saveLayout(), 0);
                             }
                         },
+                        {
+                            label: 'Plan', onClick: () => {
+                                setNodes(nds => nds.map(n => n.id === menu.nodeId ? { ...n, data: { ...n.data, mark: 'plan' } } : n));
+                                setMenu(null);
+                                setTimeout(() => saveLayout(), 0);
+                            }
+                        },
 
                     ]
                 },
@@ -940,7 +964,8 @@ const App = () => {
                             { label: 'Check (✓)', onClick: () => batchMark('check') },
                             { label: 'Star (★)', onClick: () => batchMark('star') },
                             { label: 'Coordinate (+)', onClick: () => batchMark('coordinate') },
-                            { label: 'Task (■)', onClick: () => batchMark('task') }
+                            { label: 'Task (■)', onClick: () => batchMark('task') },
+                            { label: 'Plan', onClick: () => batchMark('plan') }
                         ]
                     },
                     {

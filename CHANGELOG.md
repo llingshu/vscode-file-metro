@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.5]
+### Added
+- **Plan Mark**: Added a new "Plan" mark (Square) which features a checkbox to toggle completion directly on the node.
+- **Sidebar Support**:
+    - **Sidebar Icons**: Plan items in the sidebar now display as square icons (outlined or filled) to match the map.
+    - **Toggle Completion**: Added "Toggle Done" context menu item for Plan tasks in the sidebar.
+
+### Changed
+- **Interactions**:
+    - **Unified Click Behavior**: Single-clicking any item in the Sidebar now **only focuses** the node (in both Main Map and Local View) without opening the file.
+    - **Double Click**: Double-clicking a Sidebar item is now required to open the file.
+    - **Local View Focus**: Clicking a Sidebar item now actively updates the Local Metro View to center on that node.
+
+### Fixed
+- **Commands**: Fixed "command 'metro.focusNode' not found" error when clicking items in the sidebar.
+
 ## [0.2.4]
 ### Added
 - **Visuals**:

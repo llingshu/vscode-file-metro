@@ -87,6 +87,65 @@ export function activate(context: vscode.ExtensionContext) {
         })
     );
 
+    let lastClickId: string | undefined;
+    let lastClickTime = 0;
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('metro.focusNode', (nodeId: string | any) => {
+            // Check if arg is an item object (SidebarItem) or string
+            const id = typeof nodeId === 'string' ? nodeId : nodeId?.id;
+            const now = Date.now();
+
+            if (id) {
+                // Double Click Detection (300ms threshold)
+                // We use id matching. If unlinked task, id is 'unlinked-/path/to/file'
+                if (lastClickId === id && (now - lastClickTime) < 300) {
+                    // Double Click Detected -> Open File
+                    let filePath: string | undefined;
+
+                    // Extract file path from ID or SidebarItem
+                    if (typeof nodeId !== 'string' && nodeId.tooltip) {
+                        filePath = nodeId.tooltip; // SidebarItem uses tooltip for path
+                    } else if (id.startsWith('unlinked-')) {
+                        filePath = id.substring(9);
+                    } else {
+                        // Lookup in layout
+                        const node = fileTracker.getLayout().nodes.find(n => n.id === id);
+                        filePath = node?.filePath;
+                    }
+
+                    if (filePath) {
+                        vscode.commands.executeCommand('vscode.open', vscode.Uri.file(filePath));
+                    }
+
+                    // Reset click state
+                    lastClickId = undefined;
+                    lastClickTime = 0;
+                    return;
+                }
+
+                // Single Click detected (or first click) -> Focus Logic
+                lastClickId = id;
+                lastClickTime = now;
+
+                // 1. Focus Main Map
+                if (MetroViewPanel.currentPanel) {
+                    MetroViewPanel.currentPanel.focusNode(id);
+                } else if (!localProvider.isVisible()) {
+                    // Only open map if Local View is also not visible?
+                    // Or maybe we don't open map on single click anymore if it's not open?
+                    // User said: "In non-Metro View view... single click should transform LOCAL METRO VIEW"
+                    // So we prioritize updating Local View and do NOT force open Main Map if closed.
+                    // But if Main Map IS open, we update it.
+                }
+
+                // 2. Focus Local View (if active)
+                // We need to implement focusNode on localProvider
+                localProvider.focusNode(id);
+            }
+        })
+    );
+
     context.subscriptions.push(
         vscode.commands.registerCommand('metro.deleteGhostTask', async (item: any) => {
             if (item && item.id) {
@@ -97,6 +156,19 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand('metro.toggleTaskCompletion', async (item: SidebarItem) => {
+            // Check if it's a ghost task
+            if (item.id?.startsWith('ghost-') || item.contextValue === 'ghost-task') {
+                if (item.id) {
+                    // ghost-task IDs in items are already like 'ghost-123'
+                    // but provider expects 'ghost-123' or '123' depending on implementation
+                    // Our implementation in MetroSidebarProvider.toggleGhostTaskCompletion handles `ghost-${id}` or `id` matching.
+                    // But item.id here comes from `getGhostTasksItems` which sets it to `ghost-${g.id}`.
+                    // Let's pass it directly.
+                    await providerPlan.toggleGhostTaskCompletion(item.id);
+                }
+                return;
+            }
+
             // item.id is either node.id or 'unlinked-' + filePath
             let filePath: string | undefined;
             if (item.id?.startsWith('unlinked-')) {

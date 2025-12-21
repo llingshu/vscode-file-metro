@@ -408,4 +408,58 @@ body.is-connecting .station-handle.center.source::after {
 .station-mark.mark-task {
     /* Maybe a small icon inside or just let the shape be the mark */
     display: none;
+}/* Plan Marker: Square shape with Checkbox */
+.station-node.is-plan {
+    border-radius: 4px !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.station-node.is-plan.completed {
+    /* Completed state handled by generic .completed rule or inline style, 
+       but we can enforce specific looks here if needed */
+}
+
+.plan-checkbox {
+    width: 12px;
+    height: 12px;
+    border: 2px solid currentColor;
+    /* Uses node text color (usually white if filled, or set via style) */
+    border-radius: 2px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    transition: all 0.2s;
+    pointer-events: auto;
+    /* Ensure it catches clicks */
+    z-index: 20;
+}
+
+/* When node is filled (completed), make checkbox white/contrasting */
+.station-node.completed .plan-checkbox {
+    border-color: #fff;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.plan-checkbox:hover {
+    transform: scale(1.1);
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.station-node.completed .plan-checkbox:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+.plan-checkbox::after {
+    content: '✔';
+    font-size: 10px;
+    color: #fff;
+    display: none;
+}
+
+.station-node.completed .plan-checkbox::after {
+    display: block;
 }

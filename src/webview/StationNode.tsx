@@ -13,7 +13,7 @@ const StationNode = ({ id, data, selected }: NodeProps) => {
 
     return (
         <div
-            className={`station-node ${selected ? 'selected' : ''} ${data.status === 'missing' ? 'missing' : ''} ${data.isConnectionMode ? 'connection-target' : ''} ${data.isGhost ? 'ghost' : ''} ${data.mark === 'task' ? 'is-task' : ''} ${data.completed ? 'completed' : ''}`}
+            className={`station-node ${selected ? 'selected' : ''} ${data.status === 'missing' ? 'missing' : ''} ${data.isConnectionMode ? 'connection-target' : ''} ${data.isGhost ? 'ghost' : ''} ${data.mark === 'task' ? 'is-task' : ''} ${data.mark === 'plan' ? 'is-plan' : ''} ${data.completed ? 'completed' : ''}`}
             style={style}
             onAuxClick={(e) => {
                 // Middle Click (Button 1)
@@ -42,7 +42,23 @@ const StationNode = ({ id, data, selected }: NodeProps) => {
 
             <div className="station-label">{data.label}</div>
 
-            {data.mark && data.mark !== 'none' && (
+            {/* Plan Mark Specific Checkbox */}
+            {data.mark === 'plan' && (
+                <div
+                    className="plan-checkbox"
+                    onClick={(e) => {
+                        e.stopPropagation(); // Stop selection
+                        e.preventDefault();
+                        if (data.onToggleComplete) {
+                            data.onToggleComplete(id);
+                        }
+                    }}
+                    title={data.completed ? "Mark as Incomplete" : "Mark as Complete"}
+                >
+                </div>
+            )}
+
+            {data.mark && data.mark !== 'none' && data.mark !== 'plan' && (
                 <div
                     className={`station-mark mark-${data.mark}`}
                     style={{
