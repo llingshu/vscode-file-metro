@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { FileTracker } from './FileTracker';
 import { MetroLayout } from './types';
+import { MetroSidebarProvider } from './MetroSidebarProvider';
 
 export class MetroViewPanel {
     public static currentPanel: MetroViewPanel | undefined;
@@ -61,6 +62,42 @@ export class MetroViewPanel {
                         this._fileTracker.createNote(message.position);
                         this.updateLayout(this._fileTracker.getLayout());
                         return;
+                    case 'sidebarDrop':
+                        // Phase 10: Consume static state
+                        const pendingItems = MetroSidebarProvider.pendingDragItems;
+                        if (pendingItems.length === 0) { return; }
+
+                        pendingItems.forEach(item => {
+                            // Real Task or File
+                            const fsPath = item.command?.arguments?.[0]?.fsPath || item.tooltip;
+                            if (fsPath && !item.id?.startsWith('ghost-')) {
+                                this._fileTracker.createNodeForFile(fsPath, message.position, item.label as string);
+                            }
+                            // Ghost Task
+                            else if (item.contextValue === 'ghost-task') {
+                                this._fileTracker.createTaskNode(item.label as string, message.position);
+                                // If it was a stored ghost, remove it from sidebar
+                                if (item.id && item.id.startsWith('ghost-')) {
+                                    vscode.commands.executeCommand('metro.deleteGhostTask', { id: item.id });
+                                }
+                            }
+                        });
+
+                        this.updateLayout(this._fileTracker.getLayout());
+                        MetroSidebarProvider.pendingDragItems = []; // Clear
+                        return;
+                    case 'createGhostNode':
+                        // Instantiate Ghost Task as Real Node/File, or Link Existing File
+                        if (message.filePath) {
+                            this._fileTracker.createNodeForFile(message.filePath, message.position, message.label);
+                        } else {
+                            this._fileTracker.createTaskNode(message.label, message.position);
+                        }
+
+                        if (message.id && message.id.startsWith('ghost-')) {
+                            vscode.commands.executeCommand('metro.deleteGhostTask', { id: message.id });
+                        }
+                        return;
                     case 'renameNode':
                         vscode.window.showInputBox({
                             prompt: 'Enter new name',
@@ -85,6 +122,7 @@ export class MetroViewPanel {
     public updateLayout(layout: MetroLayout) {
         this._panel.webview.postMessage({ command: 'updateLayout', layout });
     }
+
 
     private async openFile(filePath: string) {
         vscode.window.showInformationMessage(`Attempting to open: ${filePath}`);
@@ -118,6 +156,10 @@ export class MetroViewPanel {
     private _update() {
         const webview = this._panel.webview;
         this._panel.webview.html = this._getHtmlForWebview(webview);
+    }
+
+    public async focusNode(nodeId: string) {
+        this._panel.webview.postMessage({ command: 'focusNode', nodeId });
     }
 
     private _getHtmlForWebview(webview: vscode.Webview) {

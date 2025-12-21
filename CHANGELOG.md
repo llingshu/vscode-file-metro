@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.3]
+### Added
+- **Sidebar**: Restructured into 4 stacked panels (Plan, Tasks, Coordinates, History) for better organization.
+- **Interactions**:
+    - **Single Click Focus**: Clicking a sidebar item now immediately focuses the node on the map.
+    - **Open File**: Added dedicated "Open File" context menu and button.
+
+### Changed
+- **Visuals**:
+    - **Coordinate Icons**: Updated to "Concentric Circles" design.
+    - **Sharpening**: Icons are now pixel-perfect with sharper strokes and alignment.
+    - **Icon Sizing**: Map icons have a smaller inner circle (`r=4`) while Sidebar icons remain larger (`r=3.5`) for optimal visibility in each context.
+
 ## [0.2.2]
 ### Changed
 - **Context Menu**: Improved stability with a 0.5s closing delay and smart gap detection to prevent accidental closing.

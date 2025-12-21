@@ -7,7 +7,7 @@
     "type": "git",
     "url": "https://github.com/llingshu/vscode-file-metro"
   },
-  "version": "0.2.2",
+  "version": "0.2.3",
   "icon": "images/icon.png",
   "license": "MIT",
   "engines": {
@@ -23,6 +23,36 @@
       {
         "command": "metro.open",
         "title": "Open Metro View"
+      },
+      {
+        "command": "metro.addGhostTask",
+        "title": "Add Task",
+        "icon": "$(add)"
+      },
+      {
+        "command": "metro.deleteGhostTask",
+        "title": "Delete Task",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "metro.openGhostTask",
+        "title": "Open Task",
+        "icon": "$(new-file)"
+      },
+      {
+        "command": "metro.focusNode",
+        "title": "Focus on Map",
+        "icon": "$(target)"
+      },
+      {
+        "command": "metro.openFile",
+        "title": "Open File",
+        "icon": "$(go-to-file)"
+      },
+      {
+        "command": "metro.toggleTaskCompletion",
+        "title": "Toggle Done",
+        "icon": "$(check)"
       }
     ],
     "viewsContainers": {
@@ -41,6 +71,61 @@
           "id": "metro.localView",
           "name": "Local Metro View",
           "icon": "images/icon.png"
+        },
+        {
+          "id": "metro.view.plan",
+          "name": "Plan",
+          "icon": "images/icon.png"
+        },
+        {
+          "id": "metro.view.tasks",
+          "name": "Tasks",
+          "icon": "images/icon.png"
+        },
+        {
+          "id": "metro.view.coordinates",
+          "name": "Coordinates",
+          "icon": "images/icon.png"
+        },
+        {
+          "id": "metro.view.done",
+          "name": "History",
+          "icon": "images/icon.png"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "metro.addGhostTask",
+          "when": "view == metro.view.plan",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "metro.openGhostTask",
+          "when": "view == metro.view.plan && viewItem == ghost-task",
+          "group": "inline"
+        },
+        {
+          "command": "metro.deleteGhostTask",
+          "when": "view == metro.view.plan && viewItem == ghost-task",
+          "group": "inline"
+        },
+        {
+          "command": "metro.toggleTaskCompletion",
+          "when": "viewItem =~ /task-node/ && (view == metro.view.tasks || view == metro.view.done)",
+          "group": "inline"
+        },
+        {
+          "command": "metro.openFile",
+          "when": "viewItem =~ /can-open/",
+          "group": "inline"
+        },
+        {
+          "command": "metro.openFile",
+          "when": "viewItem =~ /can-open/"
         }
       ]
     },
@@ -58,7 +143,90 @@
           "description": "Show inactive stations (background dots)"
         }
       }
-    }
+    },
+    "colors": [
+      {
+        "id": "metro.color0",
+        "description": "Red Metro Color",
+        "defaults": {
+          "dark": "#e3002c",
+          "light": "#e3002c",
+          "highContrast": "#e3002c"
+        }
+      },
+      {
+        "id": "metro.color1",
+        "description": "Blue Metro Color",
+        "defaults": {
+          "dark": "#007fd4",
+          "light": "#007fd4",
+          "highContrast": "#007fd4"
+        }
+      },
+      {
+        "id": "metro.color2",
+        "description": "Green Metro Color",
+        "defaults": {
+          "dark": "#008000",
+          "light": "#008000",
+          "highContrast": "#008000"
+        }
+      },
+      {
+        "id": "metro.color3",
+        "description": "Yellow Metro Color",
+        "defaults": {
+          "dark": "#f3a900",
+          "light": "#f3a900",
+          "highContrast": "#f3a900"
+        }
+      },
+      {
+        "id": "metro.color4",
+        "description": "Purple Metro Color",
+        "defaults": {
+          "dark": "#800080",
+          "light": "#800080",
+          "highContrast": "#800080"
+        }
+      },
+      {
+        "id": "metro.color5",
+        "description": "Orange Metro Color",
+        "defaults": {
+          "dark": "#ff7f00",
+          "light": "#ff7f00",
+          "highContrast": "#ff7f00"
+        }
+      },
+      {
+        "id": "metro.color6",
+        "description": "Gray Metro Color",
+        "defaults": {
+          "dark": "#a0a0a0",
+          "light": "#a0a0a0",
+          "highContrast": "#a0a0a0"
+        }
+      },
+      {
+        "id": "metro.coordinateColor",
+        "description": "Color for metro coordinate icons",
+        "defaults": {
+          "dark": "#e3002c",
+          "light": "#e3002c",
+          "highContrast": "#e3002c"
+        }
+      },
+      {
+        "id": "metro.transparent",
+        "description": "Transparent color for suppressing icons",
+        "defaults": {
+          "dark": "#00000000",
+          "light": "#00000000",
+          "highContrast": "#00000000"
+        }
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run package",

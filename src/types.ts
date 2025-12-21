@@ -9,6 +9,7 @@ export interface MetroNode {
     color?: string; // Custom color
     mark?: 'none' | 'default' | 'check' | 'star' | 'coordinate' | 'task';
     completed?: boolean;
+    completedAt?: number; // Timestamp for archiving logic
 }
 
 export interface MetroGroup {

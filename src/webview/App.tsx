@@ -431,8 +431,13 @@ const App = () => {
         event.preventDefault();
         event.stopPropagation();
 
-        // VS Code requires Shift to drop into webview.
-        // If Shift is not held, we hide the ghost to indicate drop is not available (or will open file).
+        // Check if it's a file drop or our custom ghost drop
+        const isFile = event.dataTransfer.types.includes('text/uri-list');
+        const isGhost = event.dataTransfer.types.includes('application/vnd.code.metro.ghost') || event.dataTransfer.types.includes('text/plain');
+
+        if (!isFile && !isGhost) return;
+
+        // VS Code webview usually only allows drop if Shift is held
         if (!event.shiftKey) {
             event.dataTransfer.dropEffect = 'none';
             setDragGhost(null);
@@ -489,53 +494,69 @@ const App = () => {
             event.preventDefault();
             setDragGhost(null); // Clear ghost
 
-            // Check for VS Code D&D data
-            // VS Code sends a list of files in 'text/uri-list'
-            const data = event.dataTransfer.getData('text/uri-list');
-            if (data) {
-                const uris = data.split('\r\n').filter(u => u);
+            console.log('App: onDrop called');
 
-                const position = screenToFlowPosition({
-                    x: event.clientX,
-                    y: event.clientY
+            const position = screenToFlowPosition({
+                x: event.clientX,
+                y: event.clientY
+            });
+
+            // Snap to grid
+            position.x = Math.round(position.x / 40) * 40;
+            position.y = Math.round(position.y / 40) * 40;
+
+            // 1. Try Custom JSON first (handled by extension or sidebar)
+            const ghostData = event.dataTransfer.getData('application/vnd.code.metro.ghost') || event.dataTransfer.getData('text/plain');
+
+            // Phase 10: State-based fallback if data is stripped
+            const hasSidebarType = event.dataTransfer.types.includes('application/vnd.code.tree.metro.sidebar') ||
+                event.dataTransfer.types.includes('application/vnd.code.metro.ghost');
+
+            if (ghostData) {
+                try {
+                    const items = JSON.parse(ghostData);
+                    if (Array.isArray(items) && items.length > 0) {
+                        items.forEach((item: any) => {
+                            if (item.label || item.filePath) {
+                                vscode.postMessage({
+                                    command: 'createGhostNode',
+                                    label: item.label || (item.filePath ? item.filePath.split(/[/\\]/).pop() : 'Station'),
+                                    id: item.id,
+                                    filePath: item.filePath,
+                                    position
+                                });
+                            }
+                        });
+                        return; // Successfully handled as custom item
+                    }
+                } catch (e) {
+                    // Not JSON, continue to URI-list fallback
+                }
+            } else if (hasSidebarType) {
+                vscode.postMessage({
+                    command: 'sidebarDrop',
+                    position
                 });
+                return;
+            }
 
-                // Snap to grid
-                position.x = Math.round(position.x / 40) * 40;
-                position.y = Math.round(position.y / 40) * 40;
-
-                const newNodes = uris.map(uri => {
+            // 2. Fallback to standard File List (VS Code Explorer or Sidebar URI-list)
+            const uriData = event.dataTransfer.getData('text/uri-list');
+            if (uriData) {
+                const uris = uriData.split('\r\n').filter(u => u);
+                uris.forEach(uri => {
                     let filePath = uri;
                     if (filePath.startsWith('file://')) {
                         filePath = decodeURIComponent(filePath.replace('file://', ''));
+                        // Strip leading slash on Windows if needed (already handled by decode/replace usually)
                     }
 
-                    return {
-                        id: uuidv4(),
-                        type: 'station',
-                        position,
-                        data: {
-                            label: filePath.split('/').pop(),
-                            filePath,
-                            status: 'active',
-                            color: METRO_COLORS[Math.floor(Math.random() * METRO_COLORS.length)],
-                            mark: 'none', // Explicitly initialize mark
-                            onRename: (id: string, oldPath: string) => {
-                                vscode.postMessage({
-                                    command: 'renameNode',
-                                    id,
-                                    oldPath
-                                });
-                            }
-                        },
-                    };
-                });
-
-                setNodes((nds) => {
-                    const updatedNodes = nds.concat(newNodes);
-                    // Save after drop
-                    setTimeout(() => saveLayout(), 0);
-                    return updatedNodes;
+                    vscode.postMessage({
+                        command: 'createGhostNode',
+                        label: filePath.split(/[/\\]/).pop(),
+                        filePath: filePath,
+                        position
+                    });
                 });
             }
         },
@@ -545,20 +566,30 @@ const App = () => {
     const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
         // Handle Ctrl/Cmd + Click for Default Mark or Task Toggle
         if (event.ctrlKey || event.metaKey) {
-            setNodes((nds) => nds.map(n => {
-                if (n.id === node.id) {
-                    // Task Marker specific toggle
-                    if (n.data.mark === 'task') {
-                        return { ...n, data: { ...n.data, completed: !n.data.completed } };
+            event.preventDefault();
+            event.stopPropagation();
+
+            setNodes((nds) => {
+                const newNodes = nds.map(n => {
+                    if (n.id === node.id) {
+                        // Task Marker specific toggle
+                        if (n.data.mark === 'task') {
+                            return { ...n, data: { ...n.data, completed: !n.data.completed } };
+                        }
+                        // Default behavior for other nodes
+                        const currentMark = n.data.mark;
+                        const newMark = currentMark === 'default' ? 'none' : 'default';
+                        return { ...n, data: { ...n.data, mark: newMark } };
                     }
-                    // Default behavior for other nodes
-                    const currentMark = n.data.mark;
-                    const newMark = currentMark === 'default' ? 'none' : 'default';
-                    return { ...n, data: { ...n.data, mark: newMark } };
-                }
-                return n;
-            }));
-            setTimeout(() => saveLayout(), 0);
+                    return n;
+                });
+
+                // Immediately trigger save to ensure file sync and persistence
+                // We use a short timeout to let the state settle if needed, or call directly with newNodes
+                return newNodes;
+            });
+
+            setTimeout(() => saveLayout(), 50); // Small delay
         }
     }, [setNodes, saveLayout]);
 
