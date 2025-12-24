@@ -829,7 +829,7 @@ const App = () => {
                     {
                         label: `Batch Mark (${selectedNodes.length})`,
                         submenu: [
-                            { label: 'Solid (Default)', onClick: () => batchMark('none') },
+                            { label: 'None', onClick: () => batchMark('none') },
                             { label: 'Blank (Ring)', onClick: () => batchMark('blank') },
                             { label: 'Hollow', onClick: () => batchMark('hollow') },
                             { label: 'Default (Circle)', onClick: () => batchMark('default') },
@@ -857,7 +857,7 @@ const App = () => {
                     label: 'Mark',
                     submenu: [
                         {
-                            label: 'Solid (Default)', onClick: () => {
+                            label: 'None', onClick: () => {
                                 setNodes(nds => nds.map(n => n.id === menu.nodeId ? { ...n, data: { ...n.data, mark: 'none' } } : n));
                                 setMenu(null); saveLayout();
                             }
@@ -957,7 +957,7 @@ const App = () => {
                     {
                         label: `Batch Mark (${selectedNodes.length})`,
                         submenu: [
-                            { label: 'Solid (Default)', onClick: () => batchMark('none') },
+                            { label: 'None', onClick: () => batchMark('none') },
                             { label: 'Blank (Ring)', onClick: () => batchMark('blank') },
                             { label: 'Hollow', onClick: () => batchMark('hollow') },
                             { label: 'Default (Circle)', onClick: () => batchMark('default') },
@@ -1108,6 +1108,14 @@ const App = () => {
                                     setCenter(node.position.x, node.position.y, { zoom: 1, duration: 800 });
                                 }
                             }}
+                            onContextMenu={(e, id) => {
+                                setMenu({
+                                    x: e.clientX,
+                                    y: e.clientY,
+                                    flowPosition: { x: 0, y: 0 }, // Dummy position
+                                    nodeId: id
+                                });
+                            }}
                         />
 
                         <NavigationPanel
@@ -1120,6 +1128,7 @@ const App = () => {
                                     setCenter(node.position.x, node.position.y, { zoom: 1, duration: 800 });
                                 }
                             }}
+
                             onToggle={(id) => {
                                 setNodes((nds) => nds.map(n => {
                                     if (n.id === id) {
@@ -1128,6 +1137,14 @@ const App = () => {
                                     return n;
                                 }));
                                 setTimeout(() => saveLayout(), 0);
+                            }}
+                            onContextMenu={(e, id) => {
+                                setMenu({
+                                    x: e.clientX,
+                                    y: e.clientY,
+                                    flowPosition: { x: 0, y: 0 }, // Dummy position
+                                    nodeId: id
+                                });
                             }}
                         />
                     </Panel>

@@ -204,8 +204,83 @@ export function activate(context: vscode.ExtensionContext) {
                 const filePath = fileTracker.createTask(item.label);
                 if (filePath) {
                     await providerPlan.removeGhostTask(ghostId);
+                    // Refresh Tasks view to show the new file
+                    providerTasks.refresh();
+                    providerDone.refresh();
+
                     const doc = await vscode.workspace.openTextDocument(filePath);
                     await vscode.window.showTextDocument(doc);
+                }
+            }
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('metro.renameNode', async (item: SidebarItem) => {
+            if (item && item.id) {
+                const node = fileTracker.getLayout().nodes.find(n => n.id === item.id);
+                if (node && node.filePath) {
+                    const newName = await vscode.window.showInputBox({
+                        prompt: 'Enter new name',
+                        value: node.label
+                    });
+                    if (newName) {
+                        fileTracker.renameFile(node.id, node.filePath, newName);
+                        // Refreshes will be triggered by file watcher/layout update
+                    }
+                }
+            }
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('metro.deleteNode', async (item: SidebarItem) => {
+            if (item && item.id) {
+                const answer = await vscode.window.showWarningMessage(`Are you sure you want to delete '${item.label}'?`, 'Yes', 'No');
+                if (answer === 'Yes') {
+                    fileTracker.deleteNode(item.id);
+                    // Also delete file? MetroView implies stations are files. 
+                    // Let's ask or just delete node from map. 
+                    // Current behavior for 'Delete Station' in map is just map node removal.
+                    // But here we are in sidebar. 
+                    // Let's stick to Map Node removal for now as "Delete Station".
+                    // If user wants to delete file, they can do it in Explorer.
+
+                    if (MetroViewPanel.currentPanel) {
+                        MetroViewPanel.currentPanel.updateLayout(fileTracker.getLayout());
+                    }
+                    localProvider.updateLayout();
+                    // Refresh sidebar
+                    providerTasks.refresh();
+                    providerCoords.refresh();
+                }
+            }
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('metro.changeColor', async (item: SidebarItem) => {
+            if (item && item.id) {
+                const colors = [
+                    { label: 'Red', description: '#e3002c' },
+                    { label: 'Blue', description: '#007fd4' },
+                    { label: 'Green', description: '#008000' },
+                    { label: 'Yellow', description: '#f3a900' },
+                    { label: 'Purple', description: '#800080' },
+                    { label: 'Orange', description: '#ff7f00' },
+                    { label: 'Gray', description: '#a0a0a0' }
+                ];
+
+                const picked = await vscode.window.showQuickPick(colors, { placeHolder: 'Select Color' });
+                if (picked) {
+                    fileTracker.updateNodeColor(item.id, picked.description);
+                    if (MetroViewPanel.currentPanel) {
+                        MetroViewPanel.currentPanel.updateLayout(fileTracker.getLayout());
+                    }
+                    localProvider.updateLayout();
+                    // Refresh all potentially affected views
+                    providerTasks.refresh();
+                    providerCoords.refresh();
                 }
             }
         })

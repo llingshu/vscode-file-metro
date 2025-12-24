@@ -292,4 +292,18 @@ export class FileTracker {
             console.error('Failed to update task completion in file:', e);
         }
     }
+
+    public deleteNode(nodeId: string) {
+        this.currentLayout.nodes = this.currentLayout.nodes.filter(n => n.id !== nodeId);
+        this.currentLayout.edges = this.currentLayout.edges.filter(e => e.source !== nodeId && e.target !== nodeId);
+        this.saveLayout(this.currentLayout);
+    }
+
+    public updateNodeColor(nodeId: string, color: string) {
+        const node = this.currentLayout.nodes.find(n => n.id === nodeId);
+        if (node) {
+            node.color = color;
+            this.saveLayout(this.currentLayout);
+        }
+    }
 }

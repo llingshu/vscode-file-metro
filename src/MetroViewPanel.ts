@@ -97,6 +97,7 @@ export class MetroViewPanel {
                         if (message.id && message.id.startsWith('ghost-')) {
                             vscode.commands.executeCommand('metro.deleteGhostTask', { id: message.id });
                         }
+                        this.updateLayout(this._fileTracker.getLayout());
                         return;
                     case 'renameNode':
                         vscode.window.showInputBox({

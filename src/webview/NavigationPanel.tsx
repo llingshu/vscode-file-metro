@@ -7,9 +7,10 @@ interface NavigationPanelProps {
     type: 'coordinate' | 'task';
     onNavigate: (id: string) => void;
     onToggle?: (id: string) => void;
+    onContextMenu?: (event: React.MouseEvent, id: string) => void;
 }
 
-export const NavigationPanel: React.FC<NavigationPanelProps> = ({ title, nodes, type, onNavigate, onToggle }) => {
+export const NavigationPanel: React.FC<NavigationPanelProps> = ({ title, nodes, type, onNavigate, onToggle, onContextMenu }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
@@ -68,6 +69,13 @@ export const NavigationPanel: React.FC<NavigationPanelProps> = ({ title, nodes, 
                                 cursor: 'default'
                             }}
                             className="nav-item"
+                            onContextMenu={(e) => {
+                                if (onContextMenu) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    onContextMenu(e, node.id);
+                                }
+                            }}
                         >
                             {/* Task Checkbox */}
                             {type === 'task' && onToggle && (

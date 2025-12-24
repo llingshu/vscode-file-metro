@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.6]
+### Added
+- **Sidebar Context Menus**: Enabled "Rename", "Change Color", and "Delete" context menu actions for items in the Plan, Tasks, and Coordinates sidebar views.
+- **Visuals**:
+    - **Sidebar Icons**: Replaced generic icons with distinct **Lucide-style** SVG icons for Plan (Calendar), Tasks (List Checks), Coordinates (Target), and History (Clock).
+    - **Coordinates Icon**: Updated Coordinates icon to a "Concentric Circles + Dot" design to match the user request.
+- **Documentation**: Added "Acknowledgements" section to README.md citing Lucide Icons.
+
+### Fixed
+- **Drag-and-Drop Refresh**: Fixed a bug where dragging a file from the VS Code Explorer to the Map required a window reload to appear. It now refreshes immediately.
+- **Context Menu Labels**: Renamed "Solid (Default)" mark option to "None" in the context menu for clarity.
+- **Panel Context Menu**: Fixed issue where context menus wouldn't open for items in the "Tasks" and "Coordinates" webview panels.
+
 ## [0.2.5]
 ### Added
 - **Plan Mark**: Added a new "Plan" mark (Square) which features a checkbox to toggle completion directly on the node.

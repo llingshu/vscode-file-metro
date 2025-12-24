@@ -54,3 +54,7 @@ I am actively working on transforming this extension into a full-featured infini
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Acknowledgements
+
+- **Icons**: [Lucide Icons](https://lucide.dev) (ISC License)

@@ -206,6 +206,7 @@ export class MetroSidebarProvider implements vscode.TreeDataProvider<SidebarItem
         // Use node color directly if valid hex, otherwise default to gray
         const hexColor = node.color ? node.color : '#a0a0a0';
 
+
         const metroColors = ['#e3002c', '#007fd4', '#008000', '#f3a900', '#800080', '#ff7f00', '#a0a0a0'];
         const colorIndex = node.color ? metroColors.findIndex(c => c.toLowerCase() === node.color?.toLowerCase()) : -1;
         const themeColorId = colorIndex !== -1 ? `metro.color${colorIndex}` : 'metro.color6';
@@ -214,12 +215,12 @@ export class MetroSidebarProvider implements vscode.TreeDataProvider<SidebarItem
             // Use custom SVG squares
             const svgDataUri = this.getSquareIconSvg(hexColor, node.completed ?? false);
             item.iconPath = vscode.Uri.parse(svgDataUri);
-            item.contextValue = 'task-node';
+            item.contextValue = (item.contextValue || '') + ' task-node';
         } else if (node.mark === 'coordinate') {
             // Use custom SVG for coordinates (Phase 13: Concentric Circles)
             const svgDataUri = this.getCoordinateIconSvg(hexColor);
             item.iconPath = vscode.Uri.parse(svgDataUri);
-            item.contextValue = 'coordinate-node';
+            item.contextValue = (item.contextValue || '') + ' coordinate-node';
         }
 
         return item;

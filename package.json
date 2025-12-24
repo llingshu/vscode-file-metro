@@ -7,7 +7,7 @@
     "type": "git",
     "url": "https://github.com/llingshu/vscode-file-metro"
   },
-  "version": "0.2.5",
+  "version": "0.2.6",
   "icon": "images/icon.png",
   "license": "MIT",
   "engines": {
@@ -53,6 +53,21 @@
         "command": "metro.toggleTaskCompletion",
         "title": "Toggle Done",
         "icon": "$(check)"
+      },
+      {
+        "command": "metro.renameNode",
+        "title": "Rename",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "metro.changeColor",
+        "title": "Change Color",
+        "icon": "$(paintcan)"
+      },
+      {
+        "command": "metro.deleteNode",
+        "title": "Delete",
+        "icon": "$(trash)"
       }
     ],
     "viewsContainers": {
@@ -75,22 +90,22 @@
         {
           "id": "metro.view.plan",
           "name": "Plan",
-          "icon": "images/icon.png"
+          "icon": "images/plan.svg"
         },
         {
           "id": "metro.view.tasks",
           "name": "Tasks",
-          "icon": "images/icon.png"
+          "icon": "images/tasks.svg"
         },
         {
           "id": "metro.view.coordinates",
           "name": "Coordinates",
-          "icon": "images/icon.png"
+          "icon": "images/coordinates.svg"
         },
         {
           "id": "metro.view.done",
           "name": "History",
-          "icon": "images/icon.png"
+          "icon": "images/history.svg"
         }
       ]
     },
@@ -114,6 +129,11 @@
           "group": "inline"
         },
         {
+          "command": "metro.deleteNode",
+          "when": "viewItem =~ /node/ && view != metro.view.plan",
+          "group": "inline"
+        },
+        {
           "command": "metro.toggleTaskCompletion",
           "when": "viewItem =~ /task-node/ && (view == metro.view.tasks || view == metro.view.done)",
           "group": "inline"
@@ -130,7 +150,23 @@
         },
         {
           "command": "metro.openFile",
-          "when": "viewItem =~ /can-open/"
+          "when": "viewItem =~ /can-open/",
+          "group": "navigation"
+        },
+        {
+          "command": "metro.renameNode",
+          "when": "viewItem =~ /node/",
+          "group": "modification"
+        },
+        {
+          "command": "metro.changeColor",
+          "when": "viewItem =~ /node/",
+          "group": "modification"
+        },
+        {
+          "command": "metro.deleteNode",
+          "when": "viewItem =~ /node/ && view != metro.view.plan",
+          "group": "modification@last"
         }
       ]
     },
